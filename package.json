@@ -6,7 +6,7 @@
   "scripts": {
     "start": "node server/server.js",
     "dev": "nodemon server/server.js",
-    "seed": "node server/data/seedData.js"
+    "seed": "node server/scripts/seedPostgres.js"
   },
   "keywords": [
     "mess",
@@ -22,7 +22,7 @@
     "cors": "^2.8.5",
     "dotenv": "^16.4.7",
     "express": "^4.21.2",
-    "mongoose": "^8.9.2"
+    "pg": "^8.13.1"
   },
   "devDependencies": {
     "nodemon": "^3.1.9"

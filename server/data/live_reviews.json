@@ -1,1 +1,24 @@
-[]
+[
+  {
+    "messId": "mem_mess_1791001108593",
+    "userName": "sahil gavade",
+    "userCollege": "MET colaage pune katraj",
+    "rating": 5,
+    "comment": "wertyuijhg",
+    "images": [],
+    "likes": 0,
+    "createdAt": "2026-10-03T12:15:57.752Z",
+    "_id": "mem_rev_1791029757752"
+  },
+  {
+    "messId": "mem_mess_1791001108593",
+    "userName": "sahil sonawane",
+    "userCollege": "MET colaage pune katraj",
+    "rating": 5,
+    "comment": "very good ds",
+    "images": [],
+    "likes": 0,
+    "createdAt": "2026-10-03T12:15:35.473Z",
+    "_id": "mem_rev_1791029735473"
+  }
+]

@@ -55,7 +55,7 @@ let PORT = parseInt(process.env.PORT, 10) || 5001;
 
 // Start server with automatic port recovery if busy
 const startServer = async () => {
-  // Connect to DB (with resilient fallback if local MongoDB is not yet running)
+  // Connect to PostgreSQL (with resilient fallback if database is configuring)
   const conn = await connectDB();
   if (conn) {
     await autoSeedDatabase();

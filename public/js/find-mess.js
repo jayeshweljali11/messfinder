@@ -18,9 +18,10 @@ let allNearbyMesses = [];
 
 // Area Presets for quick student campus exploration
 const CAMPUS_PRESETS = {
+  'panchavati': { lat: 19.8429, lng: 73.9948, name: 'Panchavati (Nashik Campus Area)' },
   'sinnar': { lat: 19.8491, lng: 73.9984, name: 'Sinnar (Devi Road / College Area)' },
-  'kothrud': { lat: 18.5074, lng: 73.8077, name: 'Kothrud (MIT World Peace Univ)' },
   'fcroad': { lat: 18.5284, lng: 73.8443, name: 'FC Road / Shivaji Nagar (Fergusson/COEP)' },
+  'kothrud': { lat: 18.5074, lng: 73.8077, name: 'Kothrud (MIT World Peace Univ)' },
   'karvenagar': { lat: 18.4912, lng: 73.8214, name: 'Karve Nagar (Cummins College)' },
   'katraj': { lat: 18.4482, lng: 73.8583, name: 'Katraj (Bharati Vidyapeeth / PICT)' },
   'vimannagar': { lat: 18.5679, lng: 73.9143, name: 'Viman Nagar (Symbiosis Campus)' },

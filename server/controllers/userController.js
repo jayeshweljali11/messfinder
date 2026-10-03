@@ -1,7 +1,6 @@
 const fs = require('fs');
 const path = require('path');
-const User = require('../models/User');
-const { getDbStatus } = require('../config/db');
+const { getDbStatus, query } = require('../config/db');
 
 const USERS_FILE = path.join(__dirname, '../data/live_users.json');
 
@@ -51,47 +50,59 @@ exports.registerUser = async (req, res, next) => {
     const cleanPhone = (phone || '').trim();
     const cleanName = name.trim();
     const cleanCollege = (college || 'Student / Bachelor').trim();
+    const finalEmail = cleanEmail || `${cleanPhone}@messfinder.student`;
 
-    // Check if user already exists
+    // 1. Check PostgreSQL if active
+    let dbUser = null;
+    if (getDbStatus()) {
+      try {
+        const checkRes = await query(
+          'SELECT * FROM users WHERE LOWER(email) = LOWER($1) OR (phone IS NOT NULL AND phone = $2)',
+          [finalEmail, cleanPhone]
+        );
+        if (checkRes.rows.length > 0) {
+          return res.status(400).json({
+            success: false,
+            message: 'An account with this Email or Phone is already registered. Please login.'
+          });
+        }
+
+        const insertRes = await query(
+          `INSERT INTO users (name, email, phone, college, password, role, created_at)
+           VALUES ($1, $2, $3, $4, $5, $6, NOW())
+           RETURNING *`,
+          [cleanName, finalEmail, cleanPhone, cleanCollege, String(password).trim(), 'student']
+        );
+        dbUser = insertRes.rows[0];
+      } catch (err) {
+        console.warn('PostgreSQL student register note:', err.message);
+      }
+    }
+
+    // 2. Also keep fallback JSON updated
     liveUsers = loadUsersSafe();
-    const exists = liveUsers.find(u => 
-      (cleanEmail && u.email && u.email.toLowerCase() === cleanEmail) ||
+    const existsInMemory = liveUsers.find(u => 
+      (finalEmail && u.email && u.email.toLowerCase() === finalEmail.toLowerCase()) ||
       (cleanPhone && u.phone && u.phone === cleanPhone)
     );
 
-    if (exists) {
+    if (existsInMemory && !dbUser) {
       return res.status(400).json({
         success: false,
         message: 'An account with this Email or Phone is already registered. Please login.'
       });
     }
 
-    // If MongoDB is connected, save to DB
-    let dbUser = null;
-    if (getDbStatus()) {
-      try {
-        dbUser = await User.create({
-          name: cleanName,
-          email: cleanEmail || `${cleanPhone}@messfinder.student`,
-          phone: cleanPhone,
-          college: cleanCollege,
-          password: password,
-          role: 'student'
-        });
-      } catch (err) {
-        console.warn('MongoDB student register note:', err.message);
-      }
-    }
-
     const newUser = {
-      _id: dbUser ? String(dbUser._id) : `stu_${Date.now()}`,
+      _id: dbUser ? String(dbUser.id) : `stu_${Date.now()}`,
+      id: dbUser ? dbUser.id : undefined,
       name: cleanName,
-      email: cleanEmail || `${cleanPhone}@messfinder.student`,
+      email: finalEmail,
       phone: cleanPhone,
       college: cleanCollege,
       password: String(password).trim(),
       role: 'student',
-      createdAt: new Date().toISOString()
+      createdAt: dbUser ? dbUser.created_at : new Date().toISOString()
     };
 
     liveUsers.unshift(newUser);
@@ -100,6 +111,7 @@ exports.registerUser = async (req, res, next) => {
     // Return sanitized student data
     const safeData = {
       _id: newUser._id,
+      id: newUser.id || newUser._id,
       name: newUser.name,
       email: newUser.email,
       phone: newUser.phone,
@@ -133,19 +145,21 @@ exports.loginUser = async (req, res, next) => {
     const cleanInput = String(email).trim().toLowerCase();
     const cleanPass = String(password).trim();
 
-    // Check MongoDB if active
+    // Check PostgreSQL if active
     if (getDbStatus()) {
       try {
-        const user = await User.findOne({
-          $or: [{ email: cleanInput }, { phone: cleanInput }],
-          password: cleanPass
-        });
-        if (user) {
+        const resDb = await query(
+          'SELECT * FROM users WHERE (LOWER(email) = $1 OR phone = $1) AND password = $2',
+          [cleanInput, cleanPass]
+        );
+        if (resDb.rows.length > 0) {
+          const user = resDb.rows[0];
           return res.status(200).json({
             success: true,
             message: `Welcome back, ${user.name}!`,
             data: {
-              _id: String(user._id),
+              _id: String(user.id),
+              id: user.id,
               name: user.name,
               email: user.email,
               phone: user.phone,
@@ -154,10 +168,12 @@ exports.loginUser = async (req, res, next) => {
             }
           });
         }
-      } catch (e) {}
+      } catch (e) {
+        console.warn('PostgreSQL login error, checking fallback:', e.message);
+      }
     }
 
-    // Check liveUsers file store
+    // Check liveUsers file store fallback
     liveUsers = loadUsersSafe();
     const matched = liveUsers.find(u => 
       ((u.email && u.email.toLowerCase() === cleanInput) ||
@@ -176,7 +192,8 @@ exports.loginUser = async (req, res, next) => {
       success: true,
       message: `Welcome back, ${matched.name}!`,
       data: {
-        _id: matched._id,
+        _id: String(matched._id || matched.id),
+        id: matched.id || matched._id,
         name: matched.name,
         email: matched.email,
         phone: matched.phone,

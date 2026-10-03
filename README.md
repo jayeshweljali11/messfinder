@@ -14,7 +14,7 @@ Students and working bachelors moving to an unfamiliar college hub or IT park of
 2. **Inspect Full Details** including monthly subscription fees, single meal trial rates, breakfast/lunch/dinner timings, and typical weekly menus.
 3. **Read & Write Verified Reviews** with star ratings and visual breakdown progress bars.
 4. **Directly Connect with Mess Owners** via 1-click calling or WhatsApp chat with prefilled inquiries.
-5. **Register New Messes** with an interactive doorstep pin-picker map and dynamic MongoDB geospatial indexing.
+5. **Register New Messes** with an interactive doorstep pin-picker map and dynamic PostgreSQL geospatial queries.
 
 ---
 
@@ -35,12 +35,13 @@ Students and working bachelors moving to an unfamiliar college hub or IT park of
 
 ### **Backend**
 - **Node.js & Express.js**: REST API architecture with clean separation of concerns.
-- **MongoDB & Mongoose**:
-  - Schemas for `Mess`, `Review`, and `User`.
-  - `2dsphere` geospatial index on GeoJSON coordinates `[longitude, latitude]`.
+- **PostgreSQL & `pg` (node-postgres)**:
+  - Relational database with JSONB support for rich nested attributes (menus, meal schedules, facilities).
+  - High-performance connection pooling via `pg.Pool`.
+  - Relational tables for `messes`, `reviews`, and `users` with foreign keys and performance indexes.
   - Resilient DataStore layer with seamless fallback ensuring high availability.
 - **Geospatial Distance Calculation**:
-  - **Haversine Great-Circle Formula** calculating exact distances in kilometers:
+  - Native SQL spherical queries & **Haversine Great-Circle Formula** calculating exact distances in kilometers:
     $$d = 2 R \arcsin\left(\sqrt{\sin^2(\Delta\phi/2) + \cos(\phi_1)\cos(\phi_2)\sin^2(\Delta\lambda/2)}\right)$$
     *(where $R = 6371$ km)*
 
@@ -50,19 +51,19 @@ Students and working bachelors moving to an unfamiliar college hub or IT park of
 
 ```text
 messfinder/
-├── package.json               # Dependencies and scripts (Express, Mongoose, CORS, Dotenv)
-├── .env                       # Environment variables (PORT, MONGODB_URI)
-├── .env.example               # Environment template
+├── package.json               # Dependencies and scripts (Express, PG, CORS, Dotenv)
+├── .env                       # Environment variables (PORT, DATABASE_URL / DB_*)
+├── .env.example               # Environment template for PostgreSQL
 ├── README.md                  # Project documentation & viva guide
 │
 ├── server/
 │   ├── server.js              # Express app entry point & static asset server
 │   ├── config/
-│   │   └── db.js              # MongoDB Mongoose connection
+│   │   └── db.js              # PostgreSQL Pool connection & auto-table init
 │   ├── models/
-│   │   ├── Mess.js            # Mess schema with 2dsphere index & GeoJSON
-│   │   ├── Review.js          # Student review schema with ratings
-│   │   └── User.js            # User model (student, messOwner)
+│   │   ├── Mess.js            # PostgreSQL Mess model & column definitions
+│   │   ├── Review.js          # PostgreSQL Review model & column definitions
+│   │   └── User.js            # PostgreSQL User model & column definitions
 │   ├── controllers/
 │   │   ├── messController.js  # CRUD, Haversine nearby discovery, filters
 │   │   ├── reviewController.js# Review creation & rating auto-recalculation
@@ -100,7 +101,8 @@ messfinder/
 
 ### Prerequisites
 - [Node.js](https://nodejs.org/) (v16.0 or higher recommended)
-- Optional: Local MongoDB or MongoDB Atlas URI (if not running, the application automatically uses the built-in resilient data store).
+- **PostgreSQL** installed locally or hosted (Supabase, Neon, Render, AWS RDS)
+- *(Note: If PostgreSQL is not yet configured, the application automatically uses the built-in resilient file data store without crashing).*
 
 ### Step 1: Install Dependencies
 Open your terminal in the project directory:
@@ -109,7 +111,21 @@ cd "c:\Users\jayesh weljali\OneDrive\Desktop\messfinder"
 npm install
 ```
 
-### Step 2: Start the Application
+### Step 2: Configure PostgreSQL Database
+1. Open pgAdmin, psql, or your PostgreSQL shell:
+```sql
+CREATE DATABASE messfinder;
+```
+2. Verify or edit your database credentials in `.env`:
+```env
+DATABASE_URL=postgresql://postgres:postgres@localhost:5432/messfinder
+```
+3. *(Optional)* Seed initial student messes and reviews into PostgreSQL:
+```bash
+npm run seed
+```
+
+### Step 3: Start the Application
 Run the server:
 ```bash
 npm start
@@ -217,7 +233,7 @@ When presenting this project to your external examiner or professor, demonstrate
 
 ## 🏆 7. Key Engineering Highlights
 - **No static mock data**: Dynamic REST API architecture.
-- **Geospatial Intelligence**: Real coordinate mathematics via Haversine formula and MongoDB 2dsphere indexing.
+- **Geospatial Intelligence**: Real coordinate mathematics via Haversine formula and PostgreSQL coordinate queries.
 - **Zero Frontend Framework Fatigue**: Clean Vanilla JavaScript and pure CSS design tokens; fast load times and accessible for college vivas.
 - **Fail-Safe Architecture**: Gracefully handles offline states or missing database daemons with zero crashes.
 

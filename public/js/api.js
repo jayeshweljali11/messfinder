@@ -1,7 +1,7 @@
 /**
  * Mess Finder - API Client Module
  * Provides unified, promise-based access to backend REST endpoints.
- * All API calls communicate directly with the Express & MongoDB backend.
+ * All API calls communicate directly with the Express & PostgreSQL backend.
  */
 
 let API_BASE_URL = 'http://localhost:5001/api';
@@ -269,17 +269,38 @@ const API = {
         }
       } catch (e) {}
 
-      // Live registered owner fallback
-      if (cleanUser === 'rahul_gavde' && cleanPass === 'password123') {
+      // Live registered owner fallback for saideep (sai bhojnalay)
+      const isSaideep = cleanUser === 'saideep' || cleanUser === 'ssaideep' || cleanUser.replace(/\D/g, '') === '7841951305' || cleanUser === 'saideep@messfinder.com';
+      const isSaideepPass = cleanPass.toLowerCase() === 'baap@123';
+      if (isSaideep && isSaideepPass) {
+        return {
+          success: true,
+          data: {
+            messId: 'mem_mess_1791001108593',
+            messName: 'sai bhojnalay',
+            ownerName: 'saideep shinde',
+            username: 'saideep',
+            email: 'saideep@messfinder.com',
+            phone: '7841951305',
+            role: 'messOwner',
+            isAuthenticated: true
+          }
+        };
+      }
+
+      // Live registered owner fallback for rahul_gavde (shree)
+      if ((cleanUser === 'rahul_gavde' || cleanUser === 'rahul') && cleanPass === 'password123') {
         return {
           success: true,
           data: {
             messId: 'mem_mess_1790965608965',
             messName: 'shree',
             ownerName: 'rahul gavde',
+            username: 'rahul_gavde',
             email: 'rahul@messfinder.com',
             phone: '+91 98220 12345',
-            role: 'messOwner'
+            role: 'messOwner',
+            isAuthenticated: true
           }
         };
       }

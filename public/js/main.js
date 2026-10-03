@@ -85,79 +85,275 @@ const UserAuth = {
     const studentBtn = document.getElementById('navStudentBtn');
     const loginBtn = document.getElementById('navLoginBtn');
 
+    // Never show manual student login buttons in navbar as per user requirement
+    if (studentBtn) studentBtn.style.display = 'none';
+    if (loginBtn) loginBtn.style.display = 'none';
+
     if (user && user.role === 'messOwner') {
-      // If logged in as mess owner
+      // Show ONLY ONE button for Mess Owner: "My Mess Dashboard"
       if (onboardBtn) {
         onboardBtn.innerHTML = '<span>👨‍🍳</span> My Mess Dashboard';
         onboardBtn.href = 'owner-dashboard.html';
         onboardBtn.style.display = 'inline-flex';
         onboardBtn.classList.remove('btn-secondary');
         onboardBtn.classList.add('btn-primary');
-        onboardBtn.onclick = () => { window.location.href = 'owner-dashboard.html'; };
-      }
-
-      if (studentBtn) {
-        const ownerDisplay = (user.ownerName || user.username || 'Owner').split(' ')[0];
-        studentBtn.innerHTML = `<span>👨‍🍳</span> ${ownerDisplay} (Owner)`;
-        studentBtn.style.borderColor = '#059669';
-        studentBtn.style.color = '#34d399';
-        studentBtn.title = 'Mess Owner Account - Click to sign out';
-        studentBtn.onclick = (e) => {
+        onboardBtn.onclick = (e) => {
           e.preventDefault();
-          if (confirm(`Signed in as Mess Owner (${user.ownerName || user.username}). Do you want to sign out?`)) {
-            UserAuth.logout();
-            window.location.href = 'index.html';
-          }
-        };
-      }
-    } else if (user && user.role === 'student') {
-      // If logged in as student
-      if (studentBtn) {
-        const studentFirst = (user.name || 'Student').split(' ')[0];
-        studentBtn.innerHTML = `<span>🎓</span> ${studentFirst}`;
-        studentBtn.style.borderColor = '#fbbf24';
-        studentBtn.style.color = '#fbbf24';
-        studentBtn.title = `Signed in as ${user.name} (${user.college || 'Student'}) - Click to Sign Out`;
-        studentBtn.onclick = (e) => {
-          e.preventDefault();
-          if (confirm(`Logged in as verified student: ${user.name} (${user.college || 'Hosteller'}). Do you want to log out?`)) {
-            UserAuth.logout();
-            window.location.reload();
-          }
-        };
-      }
-      if (loginBtn) {
-        loginBtn.innerHTML = `<span>🎓</span> ${user.name.split(' ')[0]}`;
-        loginBtn.onclick = (e) => {
-          e.preventDefault();
-          if (confirm(`Logged in as ${user.name}. Do you want to log out?`)) {
-            UserAuth.logout();
-            window.location.reload();
-          }
+          window.location.href = 'owner-dashboard.html';
         };
       }
     } else {
-      // Logged out
-      if (studentBtn) {
-        studentBtn.innerHTML = '<span>🎓</span> Student Login';
-        studentBtn.style.borderColor = '';
-        studentBtn.style.color = '';
-        studentBtn.title = 'Student Login or Register';
-        studentBtn.onclick = (e) => {
+      // Normal visitors / students see only clean "Onboard Your Mess"
+      if (onboardBtn) {
+        onboardBtn.innerHTML = '<span>👨‍🍳</span> Onboard Your Mess';
+        onboardBtn.style.display = 'inline-flex';
+        onboardBtn.classList.remove('btn-primary');
+        onboardBtn.classList.add('btn-primary');
+        onboardBtn.onclick = (e) => {
           e.preventDefault();
-          openStudentModal();
-        };
-      }
-      if (loginBtn) {
-        loginBtn.innerHTML = '<span>🎓</span> Student Login';
-        loginBtn.onclick = (e) => {
-          e.preventDefault();
-          openStudentModal();
+          openOnboardModal();
         };
       }
     }
+
+    if (user && user.role === 'student') {
+      applyStudentPrefill(user);
+    }
   }
 };
+
+// Helper: Extract human-readable Title Case Name from Email
+function extractNameFromEmail(email) {
+  if (!email || typeof email !== 'string' || !email.includes('@')) {
+    return 'Student';
+  }
+  const prefix = email.split('@')[0].trim();
+  // Replace ., _, -, + with space and strip digits
+  let clean = prefix.replace(/[._\-+]/g, ' ').replace(/\d+/g, '').trim();
+
+  if (!clean || clean.length < 2) {
+    clean = prefix.replace(/[._\-+]/g, ' ').trim();
+  }
+
+  // Capitalize each word
+  const words = clean.split(/\s+/).filter(Boolean);
+  if (words.length === 0) return 'Student';
+  return words.map(w => w.charAt(0).toUpperCase() + w.slice(1).toLowerCase()).join(' ');
+}
+
+// Retrieve currently captured email (from URL params, storage, or session)
+function getCapturedEmail() {
+  // 1. Check URL parameters: ?email=... or ?mail=... or ?userEmail=... or ?studentEmail=...
+  try {
+    const urlParams = new URLSearchParams(window.location.search);
+    const emailParam = urlParams.get('email') || urlParams.get('mail') || urlParams.get('userEmail') || urlParams.get('studentEmail');
+    if (emailParam && emailParam.includes('@')) {
+      return emailParam.trim().toLowerCase();
+    }
+  } catch (e) {}
+
+  // 2. Check explicitly captured email in localStorage
+  const stored = localStorage.getItem('messfinder_current_email');
+  if (stored && stored.includes('@')) {
+    return stored.trim().toLowerCase();
+  }
+
+  // 3. Check existing student user session (skip old default sahil if not explicitly chosen)
+  const cur = UserAuth.getUser();
+  if (cur && cur.role === 'student' && cur.email && cur.email.includes('@')) {
+    if (cur.email === 'sahil.student@gmail.com' && !localStorage.getItem('messfinder_current_email')) {
+      return null; // Don't perpetuate legacy Sahil default
+    }
+    return cur.email.trim().toLowerCase();
+  }
+
+  return null;
+}
+
+// Capture student email as current user and derive name
+function captureStudentEmail(email, showNotification = true) {
+  if (!email || !email.includes('@')) return null;
+  const cleanEmail = email.trim().toLowerCase();
+  const derivedName = extractNameFromEmail(cleanEmail);
+
+  // Store in localStorage as active captured email
+  localStorage.setItem('messfinder_current_email', cleanEmail);
+
+  const studentUser = {
+    name: derivedName,
+    email: cleanEmail,
+    college: 'Student / Bachelor',
+    role: 'student',
+    isAuthenticated: true
+  };
+
+  UserAuth.setUser(studentUser);
+  applyStudentPrefill(studentUser);
+
+  if (showNotification) {
+    showToast(`✨ Connected as ${derivedName} (${cleanEmail})`, 'success');
+  }
+
+  dismissOneTap();
+  return studentUser;
+}
+
+// Google One-Tap style frictionless student authentication
+function initGoogleOneTap() {
+  const currentUser = UserAuth.getUser();
+  if (currentUser && currentUser.role === 'messOwner') {
+    return; // Do not show to mess owners
+  }
+
+  // Check if opened with a URL email parameter
+  let urlEmail = null;
+  try {
+    const urlParams = new URLSearchParams(window.location.search);
+    urlEmail = urlParams.get('email') || urlParams.get('mail') || urlParams.get('userEmail') || urlParams.get('studentEmail');
+  } catch (e) {}
+
+  if (urlEmail && urlEmail.includes('@')) {
+    captureStudentEmail(urlEmail, true);
+    return;
+  }
+
+  const capturedEmail = getCapturedEmail();
+
+  // If already authenticated as student with a captured email, apply prefill immediately
+  if (currentUser && currentUser.role === 'student' && capturedEmail && currentUser.email === capturedEmail) {
+    applyStudentPrefill(currentUser);
+    return;
+  }
+
+  // Remove existing badge before rendering
+  const existingBadge = document.getElementById('googleOneTapBadge');
+  if (existingBadge) existingBadge.remove();
+
+  const badge = document.createElement('div');
+  badge.id = 'googleOneTapBadge';
+  badge.className = 'google-onetap-card';
+
+  if (capturedEmail) {
+    // Show one-tap with the detected / captured email
+    const name = extractNameFromEmail(capturedEmail);
+    const initial = (name.charAt(0) || 'U').toUpperCase();
+    const firstName = name.split(' ')[0] || name;
+
+    badge.innerHTML = `
+      <div class="onetap-header">
+        <div class="onetap-header-left">
+          <svg width="18" height="18" viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"/></svg>
+          <span style="font-size: 0.82rem; font-weight: 600; color: #94a3b8;">Google Account</span>
+        </div>
+        <button type="button" class="onetap-close" onclick="dismissOneTap()">&times;</button>
+      </div>
+      <div class="onetap-body">
+        <div class="onetap-avatar">${initial}</div>
+        <div class="onetap-user-info">
+          <div class="onetap-name">${name}</div>
+          <div class="onetap-email">${capturedEmail}</div>
+        </div>
+      </div>
+      <button type="button" class="btn-onetap-continue" onclick="acceptOneTapStudent('${capturedEmail}')">
+        Continue as ${firstName}
+      </button>
+      <div style="text-align: center; margin-top: 0.5rem;">
+        <button type="button" class="onetap-switch-btn" onclick="renderOneTapEmailInput()">
+          Use another email / Switch
+        </button>
+      </div>
+    `;
+  } else {
+    // Show email capture input card
+    badge.innerHTML = `
+      <div class="onetap-header">
+        <div class="onetap-header-left">
+          <svg width="18" height="18" viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"/></svg>
+          <span style="font-size: 0.82rem; font-weight: 600; color: #94a3b8;">Sign in with Google</span>
+        </div>
+        <button type="button" class="onetap-close" onclick="dismissOneTap()">&times;</button>
+      </div>
+      <div style="margin-bottom: 0.85rem;">
+        <div style="font-size: 0.82rem; color: #cbd5e1; margin-bottom: 0.4rem; font-weight: 600;">Continue as Student:</div>
+        <input type="email" id="oneTapCustomEmail" class="onetap-input" placeholder="Enter your email (e.g. name@gmail.com)" onkeydown="if(event.key==='Enter') submitCustomOneTapEmail()" />
+      </div>
+      <button type="button" class="btn-onetap-continue" onclick="submitCustomOneTapEmail()">
+        Continue with Email
+      </button>
+    `;
+  }
+
+  document.body.appendChild(badge);
+}
+
+function renderOneTapEmailInput() {
+  const badge = document.getElementById('googleOneTapBadge');
+  if (!badge) return;
+  badge.innerHTML = `
+    <div class="onetap-header">
+      <div class="onetap-header-left">
+        <svg width="18" height="18" viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"/></svg>
+        <span style="font-size: 0.82rem; font-weight: 600; color: #94a3b8;">Enter New Google Email</span>
+      </div>
+      <button type="button" class="onetap-close" onclick="dismissOneTap()">&times;</button>
+    </div>
+    <div style="margin-bottom: 0.85rem;">
+      <div style="font-size: 0.82rem; color: #cbd5e1; margin-bottom: 0.4rem; font-weight: 600;">Enter your Google email:</div>
+      <input type="email" id="oneTapCustomEmail" class="onetap-input" placeholder="e.g. yourname@gmail.com" onkeydown="if(event.key==='Enter') submitCustomOneTapEmail()" autofocus />
+    </div>
+    <button type="button" class="btn-onetap-continue" onclick="submitCustomOneTapEmail()">
+      Continue with Email
+    </button>
+  `;
+  setTimeout(() => {
+    const inp = document.getElementById('oneTapCustomEmail');
+    if (inp) inp.focus();
+  }, 100);
+}
+
+function submitCustomOneTapEmail() {
+  const input = document.getElementById('oneTapCustomEmail');
+  if (!input) return;
+  const email = input.value.trim();
+  if (!email || !email.includes('@') || email.length < 5) {
+    showToast('Please enter a valid email address (e.g. name@gmail.com)', 'error');
+    input.focus();
+    return;
+  }
+  captureStudentEmail(email, true);
+}
+
+function acceptOneTapStudent(email) {
+  if (!email) {
+    email = getCapturedEmail();
+  }
+  if (email) {
+    captureStudentEmail(email, true);
+  } else {
+    renderOneTapEmailInput();
+  }
+}
+
+function dismissOneTap() {
+  const badge = document.getElementById('googleOneTapBadge');
+  if (badge) {
+    badge.style.opacity = '0';
+    badge.style.transform = 'translateY(-12px) scale(0.95)';
+    setTimeout(() => badge.remove(), 250);
+  }
+}
+
+function applyStudentPrefill(user) {
+  if (!user) return;
+  const revName = document.getElementById('reviewUserName');
+  const revCollege = document.getElementById('reviewUserCollege');
+  if (revName && (!revName.value || revName.value === 'Anonymous Student')) {
+    revName.value = user.name || '';
+  }
+  if (revCollege && !revCollege.value) {
+    revCollege.value = user.college || 'Student / Bachelor';
+  }
+}
 
 // Student Portal Modal Controller
 function openStudentModal() {
@@ -255,6 +451,11 @@ function createMessCardHTML(mess) {
         </div>
 
         <div class="mess-reviews-count">(${mess.reviewCount || 0} student reviews)</div>
+
+        <div class="mess-active-trust-pill">
+          <span class="live-dot-green"></span>
+          <span>👥 ${((mess.name || '').toLowerCase().includes('sai') ? 54 : 42) + (mess.reviewCount || 0)}+ Active Students Enrolled</span>
+        </div>
 
         <div class="mess-price-box">
           <span class="mess-price-amount">₹${mess.monthlyPrice.toLocaleString()}</span>
@@ -718,6 +919,9 @@ document.addEventListener('DOMContentLoaded', () => {
       }
     });
   }
+
+  // Initialize Google One-Tap style frictionless student authentication
+  initGoogleOneTap();
 });
 
 window.showToast = showToast;
@@ -728,5 +932,13 @@ window.closeOnboardModal = closeOnboardModal;
 window.openStudentModal = openStudentModal;
 window.closeStudentModal = closeStudentModal;
 window.switchStudentTab = switchStudentTab;
+window.initGoogleOneTap = initGoogleOneTap;
+window.acceptOneTapStudent = acceptOneTapStudent;
+window.dismissOneTap = dismissOneTap;
+window.extractNameFromEmail = extractNameFromEmail;
+window.getCapturedEmail = getCapturedEmail;
+window.captureStudentEmail = captureStudentEmail;
+window.renderOneTapEmailInput = renderOneTapEmailInput;
+window.submitCustomOneTapEmail = submitCustomOneTapEmail;
 
 

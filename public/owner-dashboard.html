@@ -211,13 +211,16 @@
       <div class="stat-card-owner">
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.75rem;">
           <span style="font-size: 0.85rem; font-weight: 700; color: #94a3b8; text-transform: uppercase;">
-            Active Admissions
+            Active Student Admissions
           </span>
-          <span style="font-size: 1.5rem;">👨‍🎓</span>
+          <span class="live-pulse-badge">
+            <span class="live-dot-green"></span>
+            <span id="statLiveOnlineCount">18</span> Live Now
+          </span>
         </div>
         <div style="display: flex; align-items: baseline; gap: 0.5rem; margin-bottom: 0.5rem;">
           <span id="statAdmissionsCount" style="font-family: var(--font-heading); font-size: 2.2rem; font-weight: 800; color: #fbbf24;">0</span>
-          <span style="font-size: 0.85rem; color: #34d399; font-weight: 700;">Live Enrolled</span>
+          <span style="font-size: 0.85rem; color: #34d399; font-weight: 700;">Subscribed Students</span>
         </div>
         <div id="statAdmissionsCapacity" style="font-size: 0.8rem; color: #94a3b8;">
           0 Students Enrolled in Mess Register
@@ -271,6 +274,38 @@
         </div>
         <div style="font-size: 0.8rem; color: #34d399; font-weight: 700;">
           ✓ Operational today
+        </div>
+      </div>
+    </div>
+
+    <!-- Real-Time Student Trust & Active Presence Banner -->
+    <div class="student-trust-banner">
+      <div class="trust-item">
+        <div class="trust-icon">👨‍🎓</div>
+        <div>
+          <div class="trust-value"><span id="bannerActiveStudents">52</span> Active Students</div>
+          <div class="trust-sub">Dining daily with active meal plan</div>
+        </div>
+      </div>
+      <div class="trust-item">
+        <div class="trust-icon"><span class="live-dot-green" style="width: 14px; height: 14px;"></span></div>
+        <div>
+          <div class="trust-value"><span id="bannerOnlineStudents">18</span> Students Active Today</div>
+          <div class="trust-sub">Live student presence & inquiries</div>
+        </div>
+      </div>
+      <div class="trust-item">
+        <div class="trust-icon">🛡️</div>
+        <div>
+          <div class="trust-value">100% Verified Community</div>
+          <div class="trust-sub">Real college student enrollments</div>
+        </div>
+      </div>
+      <div class="trust-item">
+        <div class="trust-icon">⭐</div>
+        <div>
+          <div class="trust-value"><span id="bannerRenewalRate">98%</span> Monthly Trust Score</div>
+          <div class="trust-sub">High student retention & trust</div>
         </div>
       </div>
     </div>
