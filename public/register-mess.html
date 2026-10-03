@@ -1,0 +1,382 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Register Your Mess | Mess Finder</title>
+  <meta name="description" content="Register your mess or tiffin service on Mess Finder. Reach hundreds of college students and bachelors in your locality." />
+
+  <!-- Leaflet CSS for Pin-Picker Map -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
+
+  <!-- Stylesheets -->
+  <link rel="stylesheet" href="css/style.css" />
+  <link rel="stylesheet" href="css/components.css" />
+  <link rel="stylesheet" href="css/responsive.css" />
+
+  <!-- Favicon -->
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🍲</text></svg>" />
+</head>
+<body>
+
+  <!-- ========================================================================
+       NAVIGATION BAR
+       ======================================================================== -->
+  <header class="navbar">
+    <div class="container nav-container">
+      <a href="index.html" class="brand-logo">
+        <div class="brand-icon">🍲</div>
+        <div class="brand-text">Mess<span>Finder</span></div>
+      </a>
+
+      <nav>
+        <ul class="nav-links" id="navLinks">
+          <li><a href="index.html" class="nav-link">Home</a></li>
+          <li><a href="find-mess.html" class="nav-link">Find Mess</a></li>
+        </ul>
+      </nav>
+
+      <div class="nav-actions">
+        <button class="btn btn-primary btn-sm btn-onboard-trigger" id="navOnboardBtn" style="background: linear-gradient(135deg, #059669, #047857); border: 1.5px solid #fbbf24; font-weight: 700; box-shadow: 0 4px 12px rgba(5, 150, 105, 0.3);">
+          👨‍🍳 Onboard Your Mess
+        </button>
+        <button class="mobile-menu-btn" id="mobileMenuToggle" aria-label="Toggle navigation">
+          ☰
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- ========================================================================
+       MAIN REGISTRATION FORM
+       ======================================================================== -->
+  <main class="container" style="padding-top: 3rem; padding-bottom: 5rem; max-width: 900px;">
+    
+    <!-- Header -->
+    <div style="text-align: center; margin-bottom: 2.5rem;">
+      <span class="section-tag">Partner with Mess Finder</span>
+      <h1 style="font-family: var(--font-heading); font-size: 2.4rem; font-weight: 800; color: var(--slate-900); margin-bottom: 0.75rem;">
+        Register Your Mess or Tiffin Service
+      </h1>
+      <p style="color: var(--slate-600); font-size: 1.05rem; max-width: 620px; margin: 0 auto;">
+        List your daily meals, subscription pricing, and doorstep location. Enable nearby students to discover your kitchen and contact you directly on WhatsApp.
+      </p>
+    </div>
+
+    <!-- Registration Form -->
+    <form id="registerMessForm">
+      
+      <!-- 1. Basic Information -->
+      <div class="form-card">
+        <h2 class="form-section-title">
+          <span>📋</span> 1. Basic Information
+        </h2>
+
+        <div class="form-grid-2">
+          <div class="form-group">
+            <label class="form-label">Mess / Bhojanalay Name <span class="req">*</span></label>
+            <input type="text" id="regName" class="form-control" required placeholder="e.g. Shree Ganesh Mess & Dining" />
+          </div>
+          <div class="form-group">
+            <label class="form-label">Owner's Full Name <span class="req">*</span></label>
+            <input type="text" id="regOwnerName" class="form-control" required placeholder="e.g. Ganesh Kulkarni" />
+          </div>
+        </div>
+
+        <div class="form-grid-3">
+          <div class="form-group">
+            <label class="form-label">Phone Number (Calling) <span class="req">*</span></label>
+            <input type="tel" id="regPhone" class="form-control" required placeholder="+91 98220 12345" />
+          </div>
+          <div class="form-group">
+            <label class="form-label">WhatsApp Number</label>
+            <input type="tel" id="regWhatsApp" class="form-control" placeholder="+91 98220 12345" />
+            <span class="form-hint">For students to message you directly</span>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Email Address</label>
+            <input type="email" id="regEmail" class="form-control" placeholder="owner@gmail.com" />
+          </div>
+        </div>
+      </div>
+
+      <!-- 2. Location & Geolocation -->
+      <div class="form-card">
+        <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem; margin-bottom: 1.25rem;">
+          <h2 class="form-section-title" style="margin-bottom: 0;">
+            <span>📍</span> 2. Mess Location & Doorstep Pin
+          </h2>
+          <button type="button" id="btnUseCurrentLocation" class="btn btn-secondary btn-sm" style="font-size: 0.85rem;">
+            <span>📡</span> Use My Current Location
+          </button>
+        </div>
+
+        <p style="font-size: 0.88rem; color: #64748b; margin-bottom: 1.25rem;">
+          Students search by nearby distance (e.g. within 1 km or 3 km). Click <strong>Use My Current Location</strong> or drag the map pin to mark your exact entrance.
+        </p>
+
+        <div class="form-grid-2">
+          <div class="form-group">
+            <label class="form-label">Complete Street Address / Landmark <span class="req">*</span></label>
+            <input type="text" id="regAddress" class="form-control" required placeholder="e.g. Lane 3, Opp. MIT College Main Gate, Paud Road" />
+          </div>
+          <div class="form-group">
+            <label class="form-label">Area / Locality <span class="req">*</span></label>
+            <input type="text" id="regArea" class="form-control" required placeholder="e.g. Kothrud" />
+          </div>
+        </div>
+
+        <div class="form-grid-2">
+          <div class="form-group">
+            <label class="form-label">City <span class="req">*</span></label>
+            <input type="text" id="regCity" class="form-control" required value="Pune" />
+          </div>
+          <div class="form-group">
+            <label class="form-label">Pincode</label>
+            <input type="text" id="regPincode" class="form-control" placeholder="411038" />
+          </div>
+        </div>
+
+        <!-- Coordinates inputs (auto-filled by GPS / Pin drag) -->
+        <div class="form-grid-2" style="margin-bottom: 1rem;">
+          <div class="form-group">
+            <label class="form-label">Latitude Coords <span class="req">*</span></label>
+            <input type="number" step="any" id="regLatitude" class="form-control" required readonly style="background: #f1f5f9;" />
+          </div>
+          <div class="form-group">
+            <label class="form-label">Longitude Coords <span class="req">*</span></label>
+            <input type="number" step="any" id="regLongitude" class="form-control" required readonly style="background: #f1f5f9;" />
+          </div>
+        </div>
+
+        <!-- Pin Picker Map -->
+        <div>
+          <label class="form-label" style="margin-bottom: 0.5rem; display: block;">
+            Interactive Location Pin (Drag to refine position):
+          </label>
+          <div id="pickerMap" style="height: 280px; border-radius: var(--radius-lg); border: 1.5px solid var(--slate-200); overflow: hidden;"></div>
+        </div>
+      </div>
+
+      <!-- 3. Food Type & Subscription Pricing -->
+      <div class="form-card">
+        <h2 class="form-section-title">
+          <span>🍛</span> 3. Food Type & Pricing Details
+        </h2>
+
+        <!-- Food Type Selector Cards -->
+        <div class="form-group" style="margin-bottom: 1.5rem;">
+          <label class="form-label">Food Category Offered: <span class="req">*</span></label>
+          <div class="radio-group-cards">
+            <div class="radio-card active" data-value="Both">
+              <span style="font-size: 1.5rem;">🥗🍗</span>
+              <span>Veg & Non-Veg</span>
+              <small style="color: #64748b; font-size: 0.75rem;">Both menus served</small>
+            </div>
+            <div class="radio-card" data-value="Veg">
+              <span style="font-size: 1.5rem;">🥬</span>
+              <span>Pure Veg</span>
+              <small style="color: #64748b; font-size: 0.75rem;">100% Vegetarian</small>
+            </div>
+            <div class="radio-card" data-value="Non-Veg">
+              <span style="font-size: 1.5rem;">🍗</span>
+              <span>Non-Veg Focus</span>
+              <small style="color: #64748b; font-size: 0.75rem;">Chicken / Mutton</small>
+            </div>
+          </div>
+          <input type="hidden" id="selectedFoodType" value="Both" />
+        </div>
+
+        <div class="form-grid-2">
+          <div class="form-group">
+            <label class="form-label">Monthly Subscription Price (₹) <span class="req">*</span></label>
+            <input type="number" id="regMonthlyPrice" class="form-control" required min="500" placeholder="e.g. 3000" />
+            <span class="form-hint">Standard monthly fee (2 meals/day)</span>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Single Meal / Trial Thali Price (₹)</label>
+            <input type="number" id="regTrialPrice" class="form-control" placeholder="e.g. 100" />
+            <span class="form-hint">For students taking a 1-day taste test</span>
+          </div>
+        </div>
+
+        <!-- Meals Offered Checkboxes & Timings -->
+        <div style="margin-top: 1.5rem;">
+          <label class="form-label" style="margin-bottom: 0.75rem; display: block;">Meal Services & Timings:</label>
+          
+          <div style="display: flex; flex-direction: column; gap: 0.85rem;">
+            <!-- Breakfast -->
+            <div style="display: grid; grid-template-columns: 140px 1fr; align-items: center; gap: 1rem;">
+              <label style="display: flex; align-items: center; gap: 0.5rem; font-weight: 600; cursor: pointer;">
+                <input type="checkbox" id="mealBreakfast" checked /> 🍳 Breakfast
+              </label>
+              <input type="text" id="timingBreakfast" class="form-control" placeholder="7:30 AM - 10:00 AM" />
+            </div>
+
+            <!-- Lunch -->
+            <div style="display: grid; grid-template-columns: 140px 1fr; align-items: center; gap: 1rem;">
+              <label style="display: flex; align-items: center; gap: 0.5rem; font-weight: 600; cursor: pointer;">
+                <input type="checkbox" id="mealLunch" checked /> 🍛 Lunch
+              </label>
+              <input type="text" id="timingLunch" class="form-control" placeholder="12:00 PM - 3:30 PM" />
+            </div>
+
+            <!-- Dinner -->
+            <div style="display: grid; grid-template-columns: 140px 1fr; align-items: center; gap: 1rem;">
+              <label style="display: flex; align-items: center; gap: 0.5rem; font-weight: 600; cursor: pointer;">
+                <input type="checkbox" id="mealDinner" checked /> 🌙 Dinner
+              </label>
+              <input type="text" id="timingDinner" class="form-control" placeholder="7:30 PM - 10:30 PM" />
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 4. Menu Details -->
+      <div class="form-card">
+        <h2 class="form-section-title">
+          <span>📜</span> 4. Typical Daily Menu
+        </h2>
+
+        <div class="form-group">
+          <label class="form-label">Breakfast Items (one per line or comma separated):</label>
+          <textarea id="menuBreakfast" class="form-control" rows="2" placeholder="Poha with Lemon&#10;Upma&#10;Misal Pav&#10;Tea/Coffee"></textarea>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Lunch Menu Items:</label>
+          <textarea id="menuLunch" class="form-control" rows="3" placeholder="4 Fresh Chapatis / 2 Bhakris&#10;Paneer or Seasonal Sabzi&#10;Dal Tadka&#10;Steamed Rice & Salad"></textarea>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Dinner Menu Items:</label>
+          <textarea id="menuDinner" class="form-control" rows="3" placeholder="4 Soft Phulkas&#10;Sev Bhaji / Veg Korma&#10;Dal Fry&#10;Jeera Rice & Papad"></textarea>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Weekend / Sunday Special Dish:</label>
+          <input type="text" id="menuSpecial" class="form-control" placeholder="e.g. Sunday Feast: Chicken Sukka / Matar Paneer Thali with Gulab Jamun" />
+        </div>
+      </div>
+
+      <!-- 5. Facilities & Description -->
+      <div class="form-card">
+        <h2 class="form-section-title">
+          <span>⭐</span> 5. Facilities & Description
+        </h2>
+
+        <div class="form-group" style="margin-bottom: 1.5rem;">
+          <label class="form-label" style="margin-bottom: 0.75rem; display: block;">Mess Facilities (Select all that apply):</label>
+          <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 0.75rem;">
+            <label style="display: flex; align-items: center; gap: 0.5rem; font-size: 0.92rem; cursor: pointer;">
+              <input type="checkbox" name="facilities" value="Unlimited Chapatis & Rice" checked /> Unlimited Chapati & Rice
+            </label>
+            <label style="display: flex; align-items: center; gap: 0.5rem; font-size: 0.92rem; cursor: pointer;">
+              <input type="checkbox" name="facilities" value="RO Drinking Water" checked /> RO Purified Drinking Water
+            </label>
+            <label style="display: flex; align-items: center; gap: 0.5rem; font-size: 0.92rem; cursor: pointer;">
+              <input type="checkbox" name="facilities" value="Spacious Clean Seating" checked /> Spacious Clean Seating
+            </label>
+            <label style="display: flex; align-items: center; gap: 0.5rem; font-size: 0.92rem; cursor: pointer;">
+              <input type="checkbox" name="facilities" value="Tiffin / Takeaway Service" checked /> Daily Tiffin Packing Available
+            </label>
+            <label style="display: flex; align-items: center; gap: 0.5rem; font-size: 0.92rem; cursor: pointer;">
+              <input type="checkbox" name="facilities" value="Sunday Grand Feast" checked /> Sunday Grand Feast
+            </label>
+            <label style="display: flex; align-items: center; gap: 0.5rem; font-size: 0.92rem; cursor: pointer;">
+              <input type="checkbox" name="facilities" value="Zero Soda / Pure Oil" checked /> Zero Soda / Pure Groundnut Oil
+            </label>
+            <label style="display: flex; align-items: center; gap: 0.5rem; font-size: 0.92rem; cursor: pointer;">
+              <input type="checkbox" name="facilities" value="High-Speed Wi-Fi" /> Student Free Wi-Fi
+            </label>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">About Your Mess (Description for Students) <span class="req">*</span></label>
+          <textarea id="regDescription" class="form-control" rows="4" required placeholder="Tell students why your mess is special: food quality, spices, hygiene, years of service, student passes, hostel delivery etc..."></textarea>
+        </div>
+
+        <!-- Photos -->
+        <div class="form-group">
+          <label class="form-label">Mess Photo (Image URL or Choose Preset):</label>
+          <input type="url" id="regImageUrl" class="form-control" placeholder="https://images.unsplash.com/... (optional)" style="margin-bottom: 0.85rem;" />
+          
+          <label class="form-label" style="font-size: 0.85rem; color: #64748b;">Or pick one of our verified high-quality thali photos:</label>
+          <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; margin-top: 0.5rem;">
+            <label style="cursor: pointer; display: flex; flex-direction: column; gap: 0.3rem;">
+              <input type="radio" name="presetImage" value="https://images.unsplash.com/photo-1610057099443-fde8c4d50f91?auto=format&fit=crop&w=800&q=80" checked />
+              <img src="https://images.unsplash.com/photo-1610057099443-fde8c4d50f91?auto=format&fit=crop&w=400&q=80" alt="Homely Maharashtrian Thali" style="height: 80px; object-fit: cover; border-radius: 8px;" />
+              <span style="font-size: 0.75rem; text-align: center;">Maharashtrian Thali</span>
+            </label>
+
+            <label style="cursor: pointer; display: flex; flex-direction: column; gap: 0.3rem;">
+              <input type="radio" name="presetImage" value="https://images.unsplash.com/photo-1546833999-b9f581a1996d?auto=format&fit=crop&w=800&q=80" />
+              <img src="https://images.unsplash.com/photo-1546833999-b9f581a1996d?auto=format&fit=crop&w=400&q=80" alt="Special Non-Veg Thali" style="height: 80px; object-fit: cover; border-radius: 8px;" />
+              <span style="font-size: 0.75rem; text-align: center;">Royal North/Non-Veg</span>
+            </label>
+
+            <label style="cursor: pointer; display: flex; flex-direction: column; gap: 0.3rem;">
+              <input type="radio" name="presetImage" value="https://images.unsplash.com/photo-1626777552726-4a6b54c97e46?auto=format&fit=crop&w=800&q=80" />
+              <img src="https://images.unsplash.com/photo-1626777552726-4a6b54c97e46?auto=format&fit=crop&w=400&q=80" alt="Pure Veg Gujarati/Brahmin Thali" style="height: 80px; object-fit: cover; border-radius: 8px;" />
+              <span style="font-size: 0.75rem; text-align: center;">Pure Veg Bhojanalay</span>
+            </label>
+          </div>
+        </div>
+      </div>
+
+      <!-- Submit Button -->
+      <div style="text-align: center;">
+        <button type="submit" id="btnSubmitMess" class="btn btn-primary btn-lg" style="min-width: 260px; font-size: 1.15rem; padding: 1rem 2.5rem;">
+          Register My Mess
+        </button>
+        <p style="font-size: 0.85rem; color: #64748b; margin-top: 0.75rem;">
+          Your mess will be stored in the database and immediately discoverable by nearby students.
+        </p>
+      </div>
+    </form>
+  </main>
+
+  <!-- ========================================================================
+       REGISTRATION SUCCESS MODAL
+       ======================================================================== -->
+  <div class="modal-backdrop" id="regSuccessModal">
+    <div class="modal-box" style="text-align: center;">
+      <div style="width: 70px; height: 70px; background: #d1fae5; color: #059669; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 2.2rem; margin: 0 auto 1.25rem;">
+        ✓
+      </div>
+      <h3 style="font-family: var(--font-heading); font-size: 1.6rem; font-weight: 800; color: #0f172a; margin-bottom: 0.5rem;">
+        Your mess has been registered successfully!
+      </h3>
+      <p style="color: #64748b; font-size: 0.95rem; margin-bottom: 2rem;">
+        Congratulations! Your mess is now active in the database with real coordinates. Students searching nearby will now find your mess.
+      </p>
+
+      <div style="display: flex; gap: 1rem; flex-direction: column;">
+        <a id="btnViewCreatedMess" href="mess-details.html" class="btn btn-primary btn-lg">
+          View My Mess Details Page
+        </a>
+        <a href="find-mess.html" class="btn btn-secondary">
+          Check in Nearby Discovery
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="container footer-bottom" style="border: none; padding-top: 0;">
+      <div>© 2026 Mess Finder Platform. All rights reserved.</div>
+      <div>Designed for college students & mess entrepreneurs.</div>
+    </div>
+  </footer>
+
+  <!-- Leaflet JS -->
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+
+  <!-- App JS -->
+  <script src="js/api.js"></script>
+  <script src="js/main.js"></script>
+  <script src="js/register-mess.js"></script>
+</body>
+</html>

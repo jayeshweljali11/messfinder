@@ -1,0 +1,150 @@
+[
+  {
+    "name": "sai bhojnalay",
+    "ownerName": "saideep shinde",
+    "phone": "7841951305",
+    "whatsapp": "7841951305",
+    "email": "saideep@messfinder.com",
+    "username": "saideep",
+    "password": "baap@123",
+    "address": "nashi k panchavati",
+    "area": "Pune",
+    "city": "Pune",
+    "pincode": "411001",
+    "location": {
+      "type": "Point",
+      "coordinates": [
+        73.994875,
+        19.842967
+      ]
+    },
+    "foodType": "Both",
+    "monthlyPrice": 2500,
+    "trialPrice": 75,
+    "meals": {
+      "breakfast": {
+        "available": true,
+        "timing": "7:30 AM - 10:00 AM"
+      },
+      "lunch": {
+        "available": true,
+        "timing": "12:00 PM - 3:30 PM"
+      },
+      "dinner": {
+        "available": true,
+        "timing": "7:30 PM - 10:30 PM"
+      }
+    },
+    "menu": {
+      "breakfast": [
+        "Poha",
+        "Upma",
+        "Idli Sambhar",
+        "Special Tea"
+      ],
+      "lunch": [
+        "4 Fresh Chapatis",
+        "Paneer Sabzi",
+        "Dal Tadka",
+        "Steamed Rice"
+      ],
+      "dinner": [
+        "4 Warm Phulkas",
+        "Special Dal Fry",
+        "Jeera Rice",
+        "Sweet"
+      ],
+      "special": "Sunday Feast: Special Thali & Sweet"
+    },
+    "facilities": [
+      "Unlimited Chapatis",
+      "RO Drinking Water",
+      "Clean Seating",
+      "Tiffin Service"
+    ],
+    "description": "sai bhojnalay in Pune serves freshly prepared, hygienic and nutritious home-style meals for students and bachelors. Managed with love by saideep shinde.",
+    "images": [
+      "https://images.unsplash.com/photo-1610057099443-fde8c4d50f91?auto=format&fit=crop&w=800&q=80",
+      "https://images.unsplash.com/photo-1546833999-b9f581a1996d?auto=format&fit=crop&w=800&q=80"
+    ],
+    "rating": 4.8,
+    "reviewCount": 0,
+    "isVerified": true,
+    "createdAt": "2026-10-03T04:18:28.593Z",
+    "_id": "mem_mess_1791001108593"
+  },
+  {
+    "_id": "mem_mess_1790965608965",
+    "name": "shree",
+    "ownerName": "rahul gavde",
+    "phone": "+91 98220 12345",
+    "whatsapp": "+91 98220 12345",
+    "email": "rahul@messfinder.com",
+    "username": "rahul_gavde",
+    "password": "password123",
+    "address": "devi road sinnar",
+    "area": "sinnar",
+    "city": "Sinnar",
+    "pincode": "422103",
+    "location": {
+      "type": "Point",
+      "coordinates": [
+        73.9984,
+        19.8491
+      ]
+    },
+    "foodType": "Both",
+    "monthlyPrice": 2500,
+    "trialPrice": 80,
+    "meals": {
+      "breakfast": {
+        "available": true,
+        "timing": "7:30 AM - 10:00 AM"
+      },
+      "lunch": {
+        "available": true,
+        "timing": "12:00 PM - 3:30 PM"
+      },
+      "dinner": {
+        "available": true,
+        "timing": "7:30 PM - 10:30 PM"
+      }
+    },
+    "menu": {
+      "breakfast": [
+        "Poha",
+        "Upma",
+        "Special Chai"
+      ],
+      "lunch": [
+        "4 Warm Chapatis",
+        "Seasonal Sabzi",
+        "Dal Tadka",
+        "Steamed Rice"
+      ],
+      "dinner": [
+        "4 Rotis",
+        "Special Shev Bhaji",
+        "Dal Fry",
+        "Jeera Rice"
+      ],
+      "special": "Sunday Special Feast Thali"
+    },
+    "facilities": [
+      "Unlimited Chapatis",
+      "RO Drinking Water",
+      "Clean Seating",
+      "Tiffin Service"
+    ],
+    "description": "shree serves fresh, nutritious, and hygienic home-style daily meals for students and working bachelors on devi road sinnar. Managed by rahul gavde.",
+    "images": [
+      "https://images.unsplash.com/photo-1610057099443-fde8c4d50f91?auto=format&fit=crop&w=800&q=80",
+      "https://images.unsplash.com/photo-1546833999-b9f581a1996d?auto=format&fit=crop&w=800&q=80",
+      "https://images.unsplash.com/photo-1589301760014-d929f3979dbc?auto=format&fit=crop&w=800&q=80"
+    ],
+    "rating": 4.8,
+    "reviewCount": 0,
+    "isVerified": true,
+    "createdAt": "2026-10-02T18:00:00.000Z"
+  }
+]

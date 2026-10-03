@@ -1,0 +1,439 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Mess Details | Mess Finder</title>
+  <meta name="description" content="Check mess monthly subscription price, daily food menu, timings, photos, and verified reviews from college students." />
+
+  <!-- Leaflet CSS for Mini Map -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
+
+  <!-- Stylesheets -->
+  <link rel="stylesheet" href="css/style.css" />
+  <link rel="stylesheet" href="css/components.css" />
+  <link rel="stylesheet" href="css/responsive.css" />
+
+  <!-- Favicon -->
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🍲</text></svg>" />
+</head>
+<body>
+
+  <!-- ========================================================================
+       NAVIGATION BAR
+       ======================================================================== -->
+  <header class="navbar">
+    <div class="container nav-container">
+      <a href="index.html" class="brand-logo">
+        <div class="brand-icon">🍲</div>
+        <div class="brand-text">Mess<span>Finder</span></div>
+      </a>
+
+      <nav>
+        <ul class="nav-links" id="navLinks">
+          <li><a href="index.html" class="nav-link">Home</a></li>
+          <li><a href="find-mess.html" class="nav-link">Find Mess</a></li>
+        </ul>
+      </nav>
+
+      <div class="nav-actions">
+        <button class="btn btn-secondary btn-sm" id="navStudentBtn" style="font-weight: 700; border-color: rgba(251, 191, 36, 0.4); color: #fbbf24;">
+          🎓 Student Login
+        </button>
+        <button class="btn btn-primary btn-sm btn-onboard-trigger" id="navOnboardBtn" style="background: linear-gradient(135deg, #059669, #047857); border: 1.5px solid #fbbf24; font-weight: 700; box-shadow: 0 4px 12px rgba(5, 150, 105, 0.3);">
+          👨‍🍳 Onboard Your Mess
+        </button>
+        <button class="mobile-menu-btn" id="mobileMenuToggle" aria-label="Toggle navigation">
+          ☰
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- ========================================================================
+       MESS DETAILS CONTENT
+       ======================================================================== -->
+  <main class="container" id="messDetailsContent" style="padding-top: 2rem; padding-bottom: 4rem;">
+
+    <!-- Breadcrumb -->
+    <nav style="font-size: 0.88rem; color: #94a3b8; margin-bottom: 1.25rem;">
+      <a href="index.html" style="color: #94a3b8;">Home</a> &gt;
+      <a href="find-mess.html" style="color: #94a3b8;">Find Mess</a> &gt;
+      <span id="breadcrumbMessName" style="color: #fbbf24; font-weight: 600;">Mess Details</span>
+    </nav>
+
+    <!-- Details Hero Top Banner -->
+    <section class="details-hero">
+      <div class="details-header-row">
+        <div class="details-title-box">
+          <div style="display: flex; align-items: center; gap: 0.75rem; flex-wrap: wrap; margin-bottom: 0.5rem;">
+            <span id="detailsFoodBadge" class="badge-food-type veg" style="position: static;">● Pure Veg</span>
+            <span class="badge-verified" style="position: static; background: #059669; border: 1px solid #fbbf24;">✓ Verified Mess</span>
+            <span style="font-size: 0.85rem; color: #94a3b8;">By <strong id="detailsOwnerName" style="color: #fbbf24;">Owner</strong></span>
+          </div>
+
+          <h1 id="detailsMessName" style="color: #ffffff;">Loading Mess Name...</h1>
+
+          <div class="details-address-row">
+            <span>📍</span>
+            <span id="detailsFullAddress" style="color: #cbd5e1;">Fetching address...</span>
+          </div>
+        </div>
+
+        <!-- Rating & Pricing Summary Card -->
+        <div style="display: flex; flex-direction: column; align-items: flex-end; gap: 0.75rem;">
+          <div style="display: flex; align-items: baseline; gap: 0.5rem;">
+            <span id="detailsMonthlyPrice" style="font-family: var(--font-heading); font-size: 2.2rem; font-weight: 800; color: #fbbf24;">₹0</span>
+            <span style="font-size: 0.95rem; color: #94a3b8; font-weight: 600;">/ month</span>
+          </div>
+          <div id="detailsTrialPrice" style="font-size: 0.85rem; color: #34d399; font-weight: 700;">
+            (Single meal trial available)
+          </div>
+
+          <div style="display: flex; align-items: center; gap: 0.4rem; background: rgba(251, 191, 36, 0.15); padding: 0.35rem 0.75rem; border-radius: var(--radius-sm); border: 1px solid rgba(251, 191, 36, 0.35);">
+            <span style="color: #fbbf24; font-size: 1.1rem;">★</span>
+            <strong id="detailsRatingVal" style="color: #fbbf24; font-size: 1.1rem;">4.5</strong>
+            <span id="detailsReviewCount" style="color: #cbd5e1; font-size: 0.85rem;">(0 reviews)</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Action Buttons Bar -->
+      <div class="details-cta-bar" style="padding-top: 1.25rem; border-top: 1px solid #1e293b;">
+        <a id="btnCallOwner" href="#" class="btn btn-primary">
+          <span>📞</span> Call Mess Owner
+        </a>
+        <a id="btnWhatsAppOwner" href="#" target="_blank" rel="noopener noreferrer" class="btn btn-secondary" style="border-color: #22c55e; color: #34d399;">
+          <span>💬</span> Chat on WhatsApp
+        </a>
+        <a id="btnGetDirections" href="#" target="_blank" rel="noopener noreferrer" class="btn btn-secondary">
+          <span>📍</span> Get Directions
+        </a>
+        <a href="#reviewsSection" class="btn btn-outline" style="margin-left: auto;">
+          <span>✍️</span> Write a Review
+        </a>
+      </div>
+    </section>
+
+    <!-- Image Gallery -->
+    <section class="gallery-section">
+      <div>
+        <img id="galleryMainImage" src="" alt="Mess Food Thali" class="gallery-main-img" />
+      </div>
+      <div class="gallery-thumbs-col">
+        <img id="galleryThumb1" src="" alt="Mess Kitchen & Dining" class="gallery-thumb-img" />
+        <img id="galleryThumb2" src="" alt="Mess Meal Service" class="gallery-thumb-img" />
+      </div>
+    </section>
+
+    <!-- Two Column Layout: Left Details / Right Map & Contact -->
+    <div style="display: grid; grid-template-columns: 1.4fr 1fr; gap: 2rem; align-items: start;">
+      
+      <!-- Left Column: Menus, About, Facilities -->
+      <div>
+        <!-- Meal Timings Schedule -->
+        <div style="background: #111827; border-radius: var(--radius-xl); padding: 2rem; border: 1px solid #1e293b; margin-bottom: 2rem; box-shadow: 0 10px 25px rgba(0,0,0,0.4);">
+          <h3 style="font-family: var(--font-heading); font-size: 1.35rem; font-weight: 800; color: #ffffff; margin-bottom: 1.25rem;">
+            🕐 Daily Meal Timings
+          </h3>
+          <div id="mealTimingsGrid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem;">
+            <!-- Rendered by mess-details.js -->
+          </div>
+        </div>
+
+        <!-- Menu Details with Tabs -->
+        <div style="background: #111827; border-radius: var(--radius-xl); padding: 2rem; border: 1px solid #1e293b; margin-bottom: 2rem; box-shadow: 0 10px 25px rgba(0,0,0,0.4);">
+          <h3 style="font-family: var(--font-heading); font-size: 1.35rem; font-weight: 800; color: #ffffff; margin-bottom: 1.25rem;">
+            🍛 What’s on the Menu?
+          </h3>
+
+          <div class="menu-tabs">
+            <button class="menu-tab-btn" data-meal="breakfast">🍳 Breakfast</button>
+            <button class="menu-tab-btn active" data-meal="lunch">🍛 Lunch</button>
+            <button class="menu-tab-btn" data-meal="dinner">🌙 Dinner</button>
+          </div>
+
+          <div id="menuItemsContainer" class="menu-items-grid">
+            <!-- Dynamically populated -->
+          </div>
+
+          <!-- Sunday Special -->
+          <div class="special-highlight-card">
+            <div class="star-icon">🌟</div>
+            <div>
+              <h4 style="font-family: var(--font-heading); font-weight: 800; font-size: 1.05rem; color: #fbbf24;">
+                Weekend / Sunday Special
+              </h4>
+              <p id="specialDishText" style="color: #ffffff; font-size: 0.95rem; font-weight: 600;">
+                Special Thali & Sweet
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <!-- About This Mess -->
+        <div style="background: #111827; border-radius: var(--radius-xl); padding: 2rem; border: 1px solid #1e293b; margin-bottom: 2rem; box-shadow: 0 10px 25px rgba(0,0,0,0.4);">
+          <h3 style="font-family: var(--font-heading); font-size: 1.35rem; font-weight: 800; color: #ffffff; margin-bottom: 1rem;">
+            📖 About This Mess
+          </h3>
+          <p id="detailsDescription" style="color: #cbd5e1; line-height: 1.7; font-size: 0.98rem;">
+            Loading description...
+          </p>
+        </div>
+
+        <!-- Facilities -->
+        <div style="background: #111827; border-radius: var(--radius-xl); padding: 2rem; border: 1px solid #1e293b; box-shadow: 0 10px 25px rgba(0,0,0,0.4);">
+          <h3 style="font-family: var(--font-heading); font-size: 1.35rem; font-weight: 800; color: #ffffff; margin-bottom: 1.25rem;">
+            ✨ Mess Facilities & Hygiene
+          </h3>
+          <div id="facilitiesList" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 0.85rem;">
+            <!-- Rendered by mess-details.js -->
+          </div>
+        </div>
+      </div>
+
+      <!-- Right Column: Location Map & Direct Contact Card -->
+      <aside>
+        <!-- Mini Map Card -->
+        <div style="background: #111827; border-radius: var(--radius-xl); padding: 1.5rem; border: 1px solid #1e293b; box-shadow: 0 10px 25px rgba(0,0,0,0.4); margin-bottom: 2rem;">
+          <h4 style="font-family: var(--font-heading); font-size: 1.15rem; font-weight: 800; color: #ffffff; margin-bottom: 1rem;">
+            📍 Location & Vicinity
+          </h4>
+          <div id="detailsMiniMap" style="height: 240px; border-radius: var(--radius-lg); overflow: hidden; margin-bottom: 1rem; border: 1px solid #334155;"></div>
+          <p id="detailsArea" style="font-weight: 600; font-size: 0.92rem; color: #fbbf24; margin-bottom: 0.75rem;">
+            Pune
+          </p>
+          <a id="btnGetDirectionsSidebar" href="#" target="_blank" rel="noopener noreferrer" class="btn btn-secondary btn-sm" style="width: 100%;">
+            Open in Google Maps
+          </a>
+        </div>
+
+        <!-- Student Safety & Hygiene Promise -->
+        <div style="background: rgba(16, 185, 129, 0.12); border: 1.5px solid rgba(16, 185, 129, 0.35); border-radius: var(--radius-xl); padding: 1.75rem;">
+          <h4 style="font-family: var(--font-heading); font-size: 1.15rem; font-weight: 800; color: #34d399; margin-bottom: 0.75rem;">
+            🛡️ Mess Finder Verified
+          </h4>
+          <p style="font-size: 0.88rem; color: #cbd5e1; line-height: 1.6; margin-bottom: 1rem;">
+            This mess has been physically verified for kitchen hygiene, drinking water safety, and authentic monthly subscription rates.
+          </p>
+          <div style="font-size: 0.82rem; color: #fbbf24; font-weight: 700;">
+            ✓ Real student reviews &nbsp;•&nbsp; ✓ Zero brokerage
+          </div>
+        </div>
+      </aside>
+    </div>
+
+    <!-- ======================================================================
+         STUDENT REVIEWS SECTION
+         ====================================================================== -->
+    <section class="reviews-container" id="reviewsSection">
+      <div style="display: flex; justify-content: space-between; align-items: flex-end; flex-wrap: wrap; gap: 1rem; margin-bottom: 2rem;">
+        <div>
+          <span class="section-tag">Student Feedback</span>
+          <h2 style="font-family: var(--font-heading); font-size: 2rem; font-weight: 800; color: #ffffff;">
+            Student Reviews & Ratings
+          </h2>
+        </div>
+        <a href="#writeReviewForm" class="btn btn-primary btn-sm">
+          Write a Review
+        </a>
+      </div>
+
+      <!-- Rating Breakdown Summary -->
+      <div class="reviews-summary-grid">
+        <div class="score-display-card">
+          <div class="score-big" id="scoreBig">4.5</div>
+          <div class="score-stars">★★★★★</div>
+          <div style="font-size: 0.85rem; color: #64748b; font-weight: 600;" id="totalReviewsSummary">
+            Based on student reviews
+          </div>
+        </div>
+
+        <!-- Breakdown Progress Bars -->
+        <div class="breakdown-bars">
+          <div class="bar-row">
+            <span class="bar-star-label">5 ★</span>
+            <div class="bar-track"><div class="bar-fill" id="barFill5" style="width: 0%;"></div></div>
+            <span class="bar-percentage" id="barPct5">0%</span>
+          </div>
+          <div class="bar-row">
+            <span class="bar-star-label">4 ★</span>
+            <div class="bar-track"><div class="bar-fill" id="barFill4" style="width: 0%;"></div></div>
+            <span class="bar-percentage" id="barPct4">0%</span>
+          </div>
+          <div class="bar-row">
+            <span class="bar-star-label">3 ★</span>
+            <div class="bar-track"><div class="bar-fill" id="barFill3" style="width: 0%;"></div></div>
+            <span class="bar-percentage" id="barPct3">0%</span>
+          </div>
+          <div class="bar-row">
+            <span class="bar-star-label">2 ★</span>
+            <div class="bar-track"><div class="bar-fill" id="barFill2" style="width: 0%;"></div></div>
+            <span class="bar-percentage" id="barPct2">0%</span>
+          </div>
+          <div class="bar-row">
+            <span class="bar-star-label">1 ★</span>
+            <div class="bar-track"><div class="bar-fill" id="barFill1" style="width: 0%;"></div></div>
+            <span class="bar-percentage" id="barPct1">0%</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Reviews Feed List -->
+      <div id="reviewsList">
+        <!-- Rendered by mess-details.js -->
+      </div>
+
+      <!-- Write a Review Box -->
+      <div class="write-review-card">
+        <h3 style="font-family: var(--font-heading); font-size: 1.35rem; font-weight: 800; color: #ffffff; margin-bottom: 0.5rem;">
+          ✍️ Have You Eaten Here? Write a Review
+        </h3>
+        <p style="font-size: 0.9rem; color: #94a3b8; margin-bottom: 1.5rem;">
+          Help fellow college students and bachelors choose the right mess with your honest feedback.
+        </p>
+
+        <form id="writeReviewForm">
+          <div>
+            <label class="form-label">Rate the Food Quality & Service:</label>
+            <div class="star-rating-select">
+              <span class="star-pick active" data-val="1">★</span>
+              <span class="star-pick active" data-val="2">★</span>
+              <span class="star-pick active" data-val="3">★</span>
+              <span class="star-pick active" data-val="4">★</span>
+              <span class="star-pick active" data-val="5">★</span>
+              <span style="font-size: 0.9rem; font-weight: 700; color: #fbbf24; margin-left: 0.5rem;" id="selectedStarLabel">5 Stars</span>
+            </div>
+          </div>
+
+          <div class="form-grid-2">
+            <div class="form-group">
+              <label class="form-label">Your Name <span class="req">*</span></label>
+              <input type="text" id="reviewUserName" class="form-control" required placeholder="e.g. Your Full Name" />
+            </div>
+            <div class="form-group">
+              <label class="form-label">Your College / Hostel (Optional)</label>
+              <input type="text" id="reviewUserCollege" class="form-control" placeholder="e.g. MIT WPU, Mech 3rd Year" />
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Your Experience & Feedback <span class="req">*</span></label>
+            <textarea id="reviewComment" class="form-control" required rows="3" placeholder="Tell students about the food taste, chapati softness, cleanliness, quantity and behavior of the owner..."></textarea>
+          </div>
+
+          <button type="submit" id="btnSubmitReview" class="btn btn-primary btn-lg">
+            Submit Review
+          </button>
+        </form>
+      </div>
+    </section>
+  </main>
+
+  <!-- ========================================================================
+       STUDENT AUTHENTICATION MODAL (LOGIN & REGISTRATION)
+       ======================================================================== -->
+  <div class="modal-backdrop" id="studentAuthModal">
+    <div class="modal-content" style="max-width: 520px; padding: 2.25rem; background: #0f172a; border: 1.5px solid #10b981; border-radius: var(--radius-xl); box-shadow: 0 25px 60px rgba(0,0,0,0.85), 0 0 25px rgba(16, 185, 129, 0.15); position: relative;">
+      <button type="button" class="modal-close-btn" id="studentModalClose" aria-label="Close modal">&times;</button>
+
+      <!-- Modal Header -->
+      <div style="display: flex; align-items: center; gap: 1rem; margin-bottom: 1.5rem; padding-bottom: 1rem; border-bottom: 1px solid #1e293b;">
+        <div style="width: 50px; height: 50px; border-radius: 12px; background: rgba(251, 191, 36, 0.15); border: 1px solid rgba(251, 191, 36, 0.3); display: flex; align-items: center; justify-content: center; font-size: 1.75rem;">
+          🎓
+        </div>
+        <div>
+          <h3 style="font-family: var(--font-heading); font-size: 1.35rem; font-weight: 800; color: #ffffff; margin-bottom: 0.2rem;">
+            Student Portal
+          </h3>
+          <p style="font-size: 0.86rem; color: #94a3b8; margin: 0;">
+            Sign in to post verified ratings, save messes & connect directly.
+          </p>
+        </div>
+      </div>
+
+      <!-- Tab Switcher -->
+      <div class="onboard-tabs-bar" style="margin-bottom: 1.5rem;">
+        <button type="button" class="onboard-tab-toggle active" id="tabBtnStudentLogin" onclick="switchStudentTab('login')">
+          🔐 Student Login
+        </button>
+        <button type="button" class="onboard-tab-toggle" id="tabBtnStudentRegister" onclick="switchStudentTab('register')">
+          📝 Register Student
+        </button>
+      </div>
+
+      <!-- TAB 1: STUDENT LOGIN -->
+      <div id="studentLoginSection">
+        <form id="studentLoginForm">
+          <div class="form-group" style="margin-bottom: 1.25rem;">
+            <label class="form-label" style="color: #e2e8f0; font-weight: 600;">Registered Mobile or Email <span class="req">*</span></label>
+            <input type="text" id="studentLoginEmail" class="form-control" required placeholder="e.g. 9822012345 or student@college.edu" />
+          </div>
+          <div class="form-group" style="margin-bottom: 1.5rem;">
+            <label class="form-label" style="color: #e2e8f0; font-weight: 600;">Password <span class="req">*</span></label>
+            <input type="password" id="studentLoginPass" class="form-control" required placeholder="••••••••" />
+          </div>
+          <button type="submit" id="btnStudentLoginSubmit" class="btn btn-primary btn-lg" style="width: 100%; font-weight: 800; background: linear-gradient(135deg, #10b981, #059669); border: 1.5px solid #fbbf24; box-shadow: 0 4px 15px rgba(16, 185, 129, 0.35);">
+            🎓 Sign In as Student
+          </button>
+          <p style="text-align: center; margin-top: 1.25rem; font-size: 0.88rem; color: #94a3b8;">
+            Don't have an account yet? <a href="javascript:void(0)" onclick="switchStudentTab('register')" style="color: #fbbf24; font-weight: 700; text-decoration: underline;">Create New Account</a>
+          </p>
+        </form>
+      </div>
+
+      <!-- TAB 2: STUDENT REGISTRATION -->
+      <div id="studentRegisterSection" style="display: none;">
+        <form id="studentRegisterForm">
+          <div class="form-group" style="margin-bottom: 1rem;">
+            <label class="form-label" style="color: #e2e8f0; font-weight: 600;">Full Name <span class="req">*</span></label>
+            <input type="text" id="studentRegName" class="form-control" required placeholder="e.g. Aditya Patil" />
+          </div>
+          <div class="form-grid-2" style="margin-bottom: 1rem;">
+            <div class="form-group">
+              <label class="form-label" style="color: #e2e8f0; font-weight: 600;">Mobile Number <span class="req">*</span></label>
+              <input type="tel" id="studentRegPhone" class="form-control" required placeholder="10-digit mobile" />
+            </div>
+            <div class="form-group">
+              <label class="form-label" style="color: #e2e8f0; font-weight: 600;">College / Hostel <span class="req">*</span></label>
+              <input type="text" id="studentRegCollege" class="form-control" required placeholder="e.g. MIT Pune, Sinnar" />
+            </div>
+          </div>
+          <div class="form-grid-2" style="margin-bottom: 1.5rem;">
+            <div class="form-group">
+              <label class="form-label" style="color: #e2e8f0; font-weight: 600;">Email (Optional)</label>
+              <input type="email" id="studentRegEmail" class="form-control" placeholder="student@example.com" />
+            </div>
+            <div class="form-group">
+              <label class="form-label" style="color: #e2e8f0; font-weight: 600;">Set Password <span class="req">*</span></label>
+              <input type="password" id="studentRegPass" class="form-control" required minlength="4" placeholder="min 4 chars" />
+            </div>
+          </div>
+          <button type="submit" id="btnStudentRegSubmit" class="btn btn-primary btn-lg" style="width: 100%; font-weight: 800; background: linear-gradient(135deg, #10b981, #059669); border: 1.5px solid #fbbf24; box-shadow: 0 4px 15px rgba(16, 185, 129, 0.35);">
+            ✨ Create Student Account
+          </button>
+          <p style="text-align: center; margin-top: 1.25rem; font-size: 0.88rem; color: #94a3b8;">
+            Already registered? <a href="javascript:void(0)" onclick="switchStudentTab('login')" style="color: #fbbf24; font-weight: 700; text-decoration: underline;">Sign In Here</a>
+          </p>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="container footer-bottom" style="border: none; padding-top: 0;">
+      <div>© 2026 Mess Finder Platform. All rights reserved.</div>
+      <div>Designed for college students & bachelors seeking homely meals.</div>
+    </div>
+  </footer>
+
+  <!-- Leaflet JS -->
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+
+  <!-- App Scripts -->
+  <script src="js/api.js"></script>
+  <script src="js/main.js"></script>
+  <script src="js/mess-details.js"></script>
+</body>
+</html>

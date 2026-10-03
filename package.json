@@ -1,0 +1,30 @@
+{
+  "name": "mess-finder",
+  "version": "1.0.0",
+  "description": "Mess Finder - Modern platform for students and bachelors to discover nearby messes, compare menus and prices, and read verified reviews.",
+  "main": "server/server.js",
+  "scripts": {
+    "start": "node server/server.js",
+    "dev": "nodemon server/server.js",
+    "seed": "node server/data/seedData.js"
+  },
+  "keywords": [
+    "mess",
+    "tiffin-service",
+    "student-food",
+    "nearby-mess",
+    "geolocation",
+    "reviews"
+  ],
+  "author": "Mess Finder Team",
+  "license": "ISC",
+  "dependencies": {
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.7",
+    "express": "^4.21.2",
+    "mongoose": "^8.9.2"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.9"
+  }
+}

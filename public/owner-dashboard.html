@@ -1,0 +1,629 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Mess Owner Portal & Dashboard | Mess Finder</title>
+  <meta name="description" content="Dedicated Mess Owner Management Portal. Update monthly prices, daily food menus, meal timings, and manage student admissions and reviews." />
+
+  <!-- CSS Stylesheets -->
+  <link rel="stylesheet" href="css/style.css" />
+  <link rel="stylesheet" href="css/components.css" />
+  <link rel="stylesheet" href="css/responsive.css" />
+
+  <!-- Favicon -->
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>👨‍🍳</text></svg>" />
+
+  <style>
+    /* Dedicated Owner Portal Styling */
+    .owner-topbar {
+      background: #0b0f19;
+      color: #fff;
+      padding: 0.9rem 1.75rem;
+      border-bottom: 1.5px solid rgba(251, 191, 36, 0.3);
+      position: sticky;
+      top: 0;
+      z-index: 1000;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.5);
+    }
+
+    .owner-topbar-inner {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      max-width: 1350px;
+      margin: 0 auto;
+    }
+
+    .owner-brand {
+      display: flex;
+      align-items: center;
+      gap: 0.85rem;
+    }
+
+    .owner-portal-pill {
+      background: linear-gradient(135deg, #059669, #047857);
+      border: 1px solid #fbbf24;
+      color: #fff;
+      font-size: 0.75rem;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      padding: 0.25rem 0.65rem;
+      border-radius: var(--radius-full);
+    }
+
+    .owner-mess-status {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-size: 0.9rem;
+      color: #cbd5e1;
+      background: #151f32;
+      padding: 0.4rem 0.85rem;
+      border-radius: var(--radius-md);
+      border: 1px solid #334155;
+    }
+
+    .owner-nav-tabs {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      background: #111827;
+      padding: 0.6rem 1rem;
+      border-radius: var(--radius-lg);
+      border: 1px solid #1e293b;
+      margin-bottom: 2rem;
+      overflow-x: auto;
+    }
+
+    .owner-tab-btn {
+      padding: 0.65rem 1.25rem;
+      border-radius: var(--radius-md);
+      font-weight: 700;
+      font-size: 0.92rem;
+      color: #94a3b8;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 0.45rem;
+      white-space: nowrap;
+      transition: var(--transition);
+      background: transparent;
+    }
+
+    .owner-tab-btn:hover {
+      background: #1e293b;
+      color: #fbbf24;
+    }
+
+    .owner-tab-btn.active {
+      background: #059669;
+      color: #fff;
+      border: 1px solid #fbbf24;
+      box-shadow: 0 4px 14px rgba(16, 185, 129, 0.4);
+    }
+
+    .stat-card-owner {
+      background: #131c2e;
+      border-radius: var(--radius-xl);
+      padding: 1.5rem;
+      border: 1px solid #1e293b;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.4);
+      display: flex;
+      flex-direction: column;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .stat-card-owner::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 4px;
+      background: linear-gradient(90deg, #10b981, #fbbf24);
+    }
+
+    .sync-live-banner {
+      background: rgba(16, 185, 129, 0.12);
+      border: 1.5px solid rgba(16, 185, 129, 0.35);
+      border-radius: var(--radius-lg);
+      padding: 1rem 1.5rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+      margin-bottom: 2rem;
+    }
+
+    .admission-badge {
+      display: inline-block;
+      padding: 0.25rem 0.65rem;
+      border-radius: var(--radius-full);
+      font-size: 0.78rem;
+      font-weight: 700;
+    }
+
+    .badge-active { background: rgba(16, 185, 129, 0.2); color: #34d399; border: 1px solid rgba(16, 185, 129, 0.4); }
+    .badge-trial { background: rgba(251, 191, 36, 0.2); color: #fbbf24; border: 1px solid rgba(251, 191, 36, 0.4); }
+  </style>
+</head>
+<body style="background: var(--bg-main);">
+
+  <!-- ========================================================================
+       DEDICATED OWNER TOPBAR (NO STUDENT NAVBAR)
+       ======================================================================== -->
+  <header class="owner-topbar">
+    <div class="owner-topbar-inner">
+      <div class="owner-brand">
+        <a href="owner-dashboard.html" style="display: flex; align-items: center; gap: 0.6rem; color: #fff; font-family: var(--font-heading); font-weight: 800; font-size: 1.3rem;">
+          <span style="font-size: 1.6rem;">🍲</span> Mess<span>Finder</span>
+        </a>
+        <span class="owner-portal-pill">Owner Portal</span>
+      </div>
+
+      <div class="owner-mess-status" id="topbarMessStatus">
+        <span style="width: 10px; height: 10px; border-radius: 50%; background: #22c55e;"></span>
+        <span id="topbarMessName" style="font-weight: 700; color: #fff;">Loading Mess...</span>
+        <span style="color: #64748b;">•</span>
+        <span style="color: #4ade80; font-weight: 600;">🟢 Live for Students</span>
+      </div>
+
+      <div style="display: flex; align-items: center; gap: 0.85rem;">
+        <a id="btnStudentViewPreview" href="find-mess.html" target="_blank" rel="noopener noreferrer" class="btn btn-secondary btn-sm" style="background: rgba(255,255,255,0.1); color: #fff; border-color: rgba(255,255,255,0.2);">
+          <span>👁️</span> Student View
+        </a>
+        <button id="btnOwnerLogout" class="btn btn-secondary btn-sm" style="background: #ef4444; color: #fff; border-color: #dc2626;">
+          <span>🚪</span> Logout
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- ========================================================================
+       MAIN OWNER DASHBOARD CONTAINER
+       ======================================================================== -->
+  <main class="container" style="padding-top: 2rem; padding-bottom: 5rem; max-width: 1300px;">
+
+    <!-- Sync Notice Banner -->
+    <div class="sync-live-banner">
+      <div style="display: flex; align-items: center; gap: 0.85rem;">
+        <span style="font-size: 1.6rem;">⚡</span>
+        <div>
+          <h4 style="font-family: var(--font-heading); font-size: 1rem; font-weight: 800; color: #065f46;">
+            Real-Time Student Sync Active
+          </h4>
+          <p style="font-size: 0.85rem; color: #047857; margin-top: 0.15rem;">
+            Any price, timing, or menu updates you save below will immediately update for all students searching on Mess Finder.
+          </p>
+        </div>
+      </div>
+      <button type="button" onclick="handleSaveAll()" class="btn btn-primary btn-sm">
+        <span>💾</span> Save All Updates
+      </button>
+    </div>
+
+    <!-- 4 Key Metrics Cards -->
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 1.5rem; margin-bottom: 2rem;">
+      <!-- Stat 1: Admissions -->
+      <div class="stat-card-owner">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.75rem;">
+          <span style="font-size: 0.85rem; font-weight: 700; color: #94a3b8; text-transform: uppercase;">
+            Active Admissions
+          </span>
+          <span style="font-size: 1.5rem;">👨‍🎓</span>
+        </div>
+        <div style="display: flex; align-items: baseline; gap: 0.5rem; margin-bottom: 0.5rem;">
+          <span id="statAdmissionsCount" style="font-family: var(--font-heading); font-size: 2.2rem; font-weight: 800; color: #fbbf24;">0</span>
+          <span style="font-size: 0.85rem; color: #34d399; font-weight: 700;">Live Enrolled</span>
+        </div>
+        <div id="statAdmissionsCapacity" style="font-size: 0.8rem; color: #94a3b8;">
+          0 Students Enrolled in Mess Register
+        </div>
+      </div>
+
+      <!-- Stat 2: Rating & Reviews -->
+      <div class="stat-card-owner">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.75rem;">
+          <span style="font-size: 0.85rem; font-weight: 700; color: #94a3b8; text-transform: uppercase;">
+            Student Rating
+          </span>
+          <span style="font-size: 1.5rem;">⭐</span>
+        </div>
+        <div style="display: flex; align-items: baseline; gap: 0.5rem; margin-bottom: 0.5rem;">
+          <span id="statOwnerRating" style="font-family: var(--font-heading); font-size: 2.2rem; font-weight: 800; color: #fbbf24;">0.0</span>
+          <span style="font-size: 1.1rem; color: #fbbf24;">★</span>
+        </div>
+        <div style="font-size: 0.8rem; color: #94a3b8;">
+          Based on <strong id="statReviewsCount" style="color: #ffffff;">0</strong> live student reviews
+        </div>
+      </div>
+
+      <!-- Stat 3: Monthly Price & Est Revenue -->
+      <div class="stat-card-owner">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.75rem;">
+          <span style="font-size: 0.85rem; font-weight: 700; color: #94a3b8; text-transform: uppercase;">
+            Monthly Plan Price
+          </span>
+          <span style="font-size: 1.5rem;">💰</span>
+        </div>
+        <div style="display: flex; align-items: baseline; gap: 0.35rem; margin-bottom: 0.5rem;">
+          <span id="statOwnerPrice" style="font-family: var(--font-heading); font-size: 2.2rem; font-weight: 800; color: #fbbf24;">₹0</span>
+          <span style="font-size: 0.85rem; color: #94a3b8;">/ month</span>
+        </div>
+        <div id="statRevenueEst" style="font-size: 0.8rem; color: #34d399; font-weight: 600;">
+          Synced directly to Student Search
+        </div>
+      </div>
+
+      <!-- Stat 4: Meal Service Status -->
+      <div class="stat-card-owner">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.75rem;">
+          <span style="font-size: 0.85rem; font-weight: 700; color: #94a3b8; text-transform: uppercase;">
+            Today's Dining Status
+          </span>
+          <span style="font-size: 1.5rem;">🍽️</span>
+        </div>
+        <div style="font-size: 1.15rem; font-weight: 800; color: #ffffff; margin-bottom: 0.5rem;">
+          Breakfast • Lunch • Dinner
+        </div>
+        <div style="font-size: 0.8rem; color: #34d399; font-weight: 700;">
+          ✓ Operational today
+        </div>
+      </div>
+    </div>
+
+    <!-- Navigation Tabs -->
+    <nav class="owner-nav-tabs">
+      <button class="owner-tab-btn active" data-tab="tabPricing">
+        <span>💰</span> Pricing & Timings
+      </button>
+      <button class="owner-tab-btn" data-tab="tabMenu">
+        <span>🍛</span> Update Today’s Menu
+      </button>
+      <button class="owner-tab-btn" data-tab="tabAdmissions">
+        <span>👨‍🎓</span> Student Admissions (<span id="admissionsTabCount">0</span>)
+      </button>
+      <button class="owner-tab-btn" data-tab="tabReviews">
+        <span>💬</span> Student Reviews (<span id="reviewsTabCount">0</span>)
+      </button>
+      <button class="owner-tab-btn" data-tab="tabProfile">
+        <span>⚙️</span> Mess Info & Facilities
+      </button>
+    </nav>
+
+    <!-- TAB 1: PRICING & MEAL TIMINGS -->
+    <section id="tabPricing" class="owner-tab-content">
+      <div class="form-card">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; flex-wrap: wrap; gap: 1rem;">
+          <div>
+            <h2 class="form-section-title" style="margin-bottom: 0.25rem;">
+              <span>💰</span> Manage Monthly Subscription Price & Timings
+            </h2>
+            <p style="font-size: 0.88rem; color: #64748b;">
+              Keep your pricing competitive. When you change the price here, students searching on Mess Finder immediately see your updated rates.
+            </p>
+          </div>
+          <button type="button" id="btnSavePricing" class="btn btn-primary">
+            <span>💾</span> Save Pricing Changes
+          </button>
+        </div>
+
+        <div class="form-grid-2" style="margin-bottom: 2rem;">
+          <div class="form-group">
+            <label class="form-label">Monthly Plan Fee (₹) <span class="req">*</span></label>
+            <input type="number" id="editMonthlyPrice" class="form-control" style="font-size: 1.25rem; font-weight: 700; color: #047857;" />
+            <span class="form-hint">Standard monthly fee (includes 2 regular daily meals)</span>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Single Meal / Trial Thali Price (₹)</label>
+            <input type="number" id="editTrialPrice" class="form-control" style="font-size: 1.25rem; font-weight: 700;" />
+            <span class="form-hint">For students taking a 1-day taste test before subscribing</span>
+          </div>
+        </div>
+
+        <!-- Meal Timings & Active Switch -->
+        <h3 style="font-family: var(--font-heading); font-size: 1.15rem; font-weight: 800; margin-bottom: 1rem;">
+          🕐 Meal Timings & Daily Availability
+        </h3>
+
+        <div style="display: flex; flex-direction: column; gap: 1.25rem;">
+          <!-- Breakfast -->
+          <div style="display: grid; grid-template-columns: 180px 1fr 140px; align-items: center; gap: 1.25rem; padding: 1rem; background: var(--slate-50); border-radius: var(--radius-md); border: 1px solid var(--slate-200);">
+            <div style="display: flex; align-items: center; gap: 0.6rem; font-weight: 700;">
+              <span style="font-size: 1.35rem;">🍳</span> Breakfast
+            </div>
+            <input type="text" id="editTimingBreakfast" class="form-control" placeholder="7:30 AM - 10:00 AM" />
+            <label style="display: flex; align-items: center; gap: 0.5rem; font-weight: 600; font-size: 0.85rem; cursor: pointer;">
+              <input type="checkbox" id="editAvailBreakfast" checked /> Available
+            </label>
+          </div>
+
+          <!-- Lunch -->
+          <div style="display: grid; grid-template-columns: 180px 1fr 140px; align-items: center; gap: 1.25rem; padding: 1rem; background: var(--slate-50); border-radius: var(--radius-md); border: 1px solid var(--slate-200);">
+            <div style="display: flex; align-items: center; gap: 0.6rem; font-weight: 700;">
+              <span style="font-size: 1.35rem;">🍛</span> Lunch
+            </div>
+            <input type="text" id="editTimingLunch" class="form-control" placeholder="12:00 PM - 3:30 PM" />
+            <label style="display: flex; align-items: center; gap: 0.5rem; font-weight: 600; font-size: 0.85rem; cursor: pointer;">
+              <input type="checkbox" id="editAvailLunch" checked /> Available
+            </label>
+          </div>
+
+          <!-- Dinner -->
+          <div style="display: grid; grid-template-columns: 180px 1fr 140px; align-items: center; gap: 1.25rem; padding: 1rem; background: var(--slate-50); border-radius: var(--radius-md); border: 1px solid var(--slate-200);">
+            <div style="display: flex; align-items: center; gap: 0.6rem; font-weight: 700;">
+              <span style="font-size: 1.35rem;">🌙</span> Dinner
+            </div>
+            <input type="text" id="editTimingDinner" class="form-control" placeholder="7:30 PM - 10:30 PM" />
+            <label style="display: flex; align-items: center; gap: 0.5rem; font-weight: 600; font-size: 0.85rem; cursor: pointer;">
+              <input type="checkbox" id="editAvailDinner" checked /> Available
+            </label>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- TAB 2: UPDATE TODAY'S MENU -->
+    <section id="tabMenu" class="owner-tab-content" style="display: none;">
+      <div class="form-card">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; flex-wrap: wrap; gap: 1rem;">
+          <div>
+            <h2 class="form-section-title" style="margin-bottom: 0.25rem;">
+              <span>🍲</span> Update Daily Sabzi & Food Menu
+            </h2>
+            <p style="font-size: 0.88rem; color: #64748b;">
+              Students love checking today's sabzi before coming for lunch! Update your menu below.
+            </p>
+          </div>
+          <button type="button" id="btnSaveMenu" class="btn btn-primary">
+            <span>🚀</span> Publish Today's Menu
+          </button>
+        </div>
+
+        <div class="form-grid-3">
+          <div class="form-group">
+            <label class="form-label">🍳 Breakfast Menu Items:</label>
+            <textarea id="editMenuBreakfast" class="form-control" rows="4" placeholder="Poha with Lemon&#10;Upma&#10;Idli Sambhar&#10;Tea/Coffee"></textarea>
+            <span class="form-hint">Enter one dish per line</span>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">🍛 Lunch Menu Items:</label>
+            <textarea id="editMenuLunch" class="form-control" rows="4" placeholder="4 Fresh Chapatis / 2 Bhakris&#10;Paneer Butter Masala&#10;Dal Tadka&#10;Steamed Rice & Salad"></textarea>
+            <span class="form-hint">Today's special vegetable & chapatis</span>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">🌙 Dinner Menu Items:</label>
+            <textarea id="editMenuDinner" class="form-control" rows="4" placeholder="4 Soft Phulkas&#10;Shev Bhaji / Mix Veg&#10;Dal Fry&#10;Jeera Rice & Papad"></textarea>
+            <span class="form-hint">Evening light & homely meal</span>
+          </div>
+        </div>
+
+        <div class="form-group" style="margin-top: 1.5rem;">
+          <label class="form-label">🌟 Sunday / Weekend Special Feast Dish:</label>
+          <input type="text" id="editMenuSpecial" class="form-control" placeholder="Sunday Special: Chicken Sukka / Matar Paneer Thali with Hot Gulab Jamun" />
+        </div>
+      </div>
+    </section>
+
+    <!-- TAB 3: STUDENT ADMISSIONS -->
+    <section id="tabAdmissions" class="owner-tab-content" style="display: none;">
+      <div class="form-card">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; flex-wrap: wrap; gap: 1rem;">
+          <div>
+            <h2 class="form-section-title" style="margin-bottom: 0.25rem;">
+              <span>👨‍🎓</span> Active Student Admissions & Inquiries
+            </h2>
+            <p style="font-size: 0.88rem; color: #64748b;">
+              Direct record of students subscribed to your mess.
+            </p>
+          </div>
+          <div style="display: flex; align-items: center; gap: 0.75rem;">
+            <button class="btn btn-primary btn-sm" id="btnOpenAddStudentModal" type="button">
+              <span>➕</span> Add Student Admission
+            </button>
+            <button class="btn btn-secondary btn-sm" id="btnExportAdmissions" type="button">
+              <span>📥</span> Export Admissions
+            </button>
+          </div>
+        </div>
+
+        <div style="overflow-x: auto;">
+          <table style="width: 100%; border-collapse: collapse; text-align: left; font-size: 0.92rem;">
+            <thead>
+              <tr style="border-bottom: 2px solid var(--slate-200); color: var(--slate-600); font-size: 0.82rem; text-transform: uppercase;">
+                <th style="padding: 0.75rem 1rem;">Student Name</th>
+                <th style="padding: 0.75rem 1rem;">College / Hostel</th>
+                <th style="padding: 0.75rem 1rem;">Subscribed Plan</th>
+                <th style="padding: 0.75rem 1rem;">Join Date</th>
+                <th style="padding: 0.75rem 1rem;">Status</th>
+                <th style="padding: 0.75rem 1rem;">Action</th>
+              </tr>
+            </thead>
+            <tbody id="admissionsTableBody">
+              <!-- Rendered dynamically -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- TAB 4: STUDENT REVIEWS -->
+    <section id="tabReviews" class="owner-tab-content" style="display: none;">
+      <div class="form-card">
+        <h2 class="form-section-title" style="margin-bottom: 0.5rem;">
+          <span>💬</span> Student Reviews & Feedback
+        </h2>
+        <p style="font-size: 0.88rem; color: #64748b; margin-bottom: 1.5rem;">
+          See what students and hostellers are saying about your food taste and hospitality.
+        </p>
+
+        <div id="ownerReviewsList">
+          <!-- Rendered dynamically -->
+        </div>
+      </div>
+    </section>
+
+    <!-- TAB 5: MESS PROFILE & FACILITIES -->
+    <section id="tabProfile" class="owner-tab-content" style="display: none;">
+      <div class="form-card">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+          <h2 class="form-section-title" style="margin-bottom: 0;">
+            <span>⚙️</span> Mess Details & Facilities
+          </h2>
+          <button type="button" id="btnSaveProfile" class="btn btn-primary">
+            <span>💾</span> Save Details
+          </button>
+        </div>
+
+        <div class="form-grid-2">
+          <div class="form-group">
+            <label class="form-label">Mess Name</label>
+            <input type="text" id="editMessName" class="form-control" />
+          </div>
+          <div class="form-group">
+            <label class="form-label">Owner Name</label>
+            <input type="text" id="editOwnerName" class="form-control" />
+          </div>
+        </div>
+
+        <div class="form-grid-3">
+          <div class="form-group">
+            <label class="form-label">Calling Phone</label>
+            <input type="text" id="editPhone" class="form-control" />
+          </div>
+          <div class="form-group">
+            <label class="form-label">WhatsApp Number</label>
+            <input type="text" id="editWhatsApp" class="form-control" />
+          </div>
+          <div class="form-group">
+            <label class="form-label">Food Type</label>
+            <select id="editFoodType" class="form-control">
+              <option value="Both">Both Veg & Non-Veg</option>
+              <option value="Veg">Pure Veg</option>
+              <option value="Non-Veg">Non-Veg</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">About Mess / Description for Students:</label>
+          <textarea id="editDescription" class="form-control" rows="4"></textarea>
+        </div>
+      </div>
+    </section>
+
+    <!-- Invisible trigger for global save -->
+    <button id="btnSaveAllQuick" style="display: none;"></button>
+  </main>
+
+  <!-- ========================================================================
+       MESS OWNER STRICT AUTHENTICATION GATE MODAL
+       ======================================================================== -->
+  <div class="modal-backdrop" id="ownerGateModal" style="display: none; z-index: 99999; background: rgba(5, 8, 15, 0.94); backdrop-filter: blur(12px);">
+    <div class="modal-box" style="max-width: 480px; text-align: center; border: 1.5px solid #fbbf24; background: #111827; box-shadow: 0 25px 60px rgba(0,0,0,0.8); color: #f8fafc;">
+      <div style="width: 64px; height: 64px; border-radius: 50%; background: linear-gradient(135deg, #059669, #047857); border: 2px solid #fbbf24; color: #fff; font-size: 2rem; display: flex; align-items: center; justify-content: center; margin: 0 auto 1.25rem; box-shadow: 0 4px 15px rgba(16,185,129,0.4);">
+        🔒
+      </div>
+      
+      <h3 style="font-family: var(--font-heading); font-size: 1.5rem; font-weight: 800; color: #ffffff; margin-bottom: 0.5rem;">
+        Mess Owner Login Required
+      </h3>
+      <p style="font-size: 0.92rem; color: #94a3b8; margin-bottom: 1.5rem; line-height: 1.5;">
+        This dashboard is private and restricted only to verified mess owners. Please authenticate with your owner credentials.
+      </p>
+
+      <div id="gateErrorAlert" style="display: none; background: rgba(239, 68, 68, 0.15); border: 1px solid rgba(239, 68, 68, 0.4); color: #f87171; border-radius: var(--radius-md); padding: 0.75rem; font-size: 0.88rem; font-weight: 600; margin-bottom: 1.25rem;">
+      </div>
+
+      <form id="ownerGateForm" style="text-align: left;">
+        <div class="form-group">
+          <label class="form-label">Owner Username or Registered Mobile</label>
+          <input type="text" id="gateUsername" class="form-control" required placeholder="e.g. rahul_gavde" />
+        </div>
+        <div class="form-group">
+          <label class="form-label">Password</label>
+          <input type="password" id="gatePassword" class="form-control" required placeholder="••••••••" />
+        </div>
+        <button type="submit" id="btnGateLoginSubmit" class="btn btn-primary btn-lg" style="width: 100%; margin-top: 0.75rem; background: linear-gradient(135deg, #059669, #047857); border: 1.5px solid #fbbf24; font-weight: 800;">
+          🔐 Sign In to My Dashboard
+        </button>
+      </form>
+
+      <div style="margin-top: 1.5rem; padding-top: 1rem; border-top: 1px solid #1e293b;">
+        <a href="index.html" class="btn btn-secondary btn-sm" style="width: 100%;">
+          ← Return to Student Mess Finder
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========================================================================
+       ADD LIVE STUDENT ADMISSION MODAL
+       ======================================================================== -->
+  <div class="modal-backdrop" id="addStudentModal" style="display: none; z-index: 10000; background: rgba(5, 8, 15, 0.88); backdrop-filter: blur(8px);">
+    <div class="modal-box" style="background: #111827; border: 1.5px solid rgba(251, 191, 36, 0.4); max-width: 520px; color: #f8fafc; box-shadow: 0 25px 60px rgba(0,0,0,0.8);">
+      <button class="modal-close-btn" id="closeAddStudentModal">&times;</button>
+      <div style="display: flex; align-items: center; gap: 0.85rem; margin-bottom: 1.5rem; border-bottom: 1px solid #1e293b; padding-bottom: 1rem;">
+        <div style="width: 44px; height: 44px; border-radius: 10px; background: rgba(16, 185, 129, 0.2); border: 1px solid #10b981; display: flex; align-items: center; justify-content: center; font-size: 1.4rem;">
+          👨‍🎓
+        </div>
+        <div>
+          <h3 style="font-family: var(--font-heading); font-size: 1.3rem; font-weight: 800; color: #ffffff;">Register Student Admission</h3>
+          <p style="font-size: 0.85rem; color: #94a3b8;">Add a student subscriber to your active live mess register</p>
+        </div>
+      </div>
+      <form id="addStudentForm">
+        <div class="form-group">
+          <label class="form-label">Student Full Name <span class="req">*</span></label>
+          <input type="text" id="newStudentName" class="form-control" required placeholder="e.g. Omkar Shinde" />
+        </div>
+        <div class="form-group">
+          <label class="form-label">College / Hostel / Company</label>
+          <input type="text" id="newStudentCollege" class="form-control" placeholder="e.g. Sinnar Polytechnic / College Hostel" />
+        </div>
+        <div class="form-group">
+          <label class="form-label">Phone / WhatsApp Number <span class="req">*</span></label>
+          <input type="tel" id="newStudentPhone" class="form-control" required placeholder="e.g. +91 98220 12345" />
+        </div>
+        <div class="form-grid-2">
+          <div class="form-group">
+            <label class="form-label">Subscribed Meal Plan</label>
+            <select id="newStudentPlan" class="form-control">
+              <option value="Monthly Both (Lunch & Dinner)">Monthly Both (Lunch & Dinner)</option>
+              <option value="Monthly Pure Veg">Monthly Pure Veg</option>
+              <option value="Monthly Veg (With Breakfast)">Monthly Veg (With Breakfast)</option>
+              <option value="Single Meal Trial">Single Meal Trial</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Admission Status</label>
+            <select id="newStudentStatus" class="form-control">
+              <option value="Active">Active</option>
+              <option value="Trial">Trial</option>
+            </select>
+          </div>
+        </div>
+        <div style="display: flex; gap: 0.75rem; margin-top: 1.5rem;">
+          <button type="submit" class="btn btn-primary" style="flex: 1; font-weight: 700;">
+            <span>💾</span> Save Student Admission
+          </button>
+          <button type="button" class="btn btn-secondary" id="cancelAddStudent">
+            Cancel
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Scripts -->
+  <script src="js/api.js"></script>
+  <script src="js/main.js"></script>
+  <script src="js/owner-dashboard.js"></script>
+</body>
+</html>
